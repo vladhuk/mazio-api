@@ -35,9 +35,15 @@ module.exports = {
         extensions: ['.ts'],
       },
     },
+    node: {
+      allowModules: ['body-parser'],
+      tryExtensions: ['.ts', '.d.ts', '.js'],
+    },
   },
 
   rules: {
     'prettier/prettier': [WARN],
+
+    '@typescript-eslint/no-non-null-assertion': OFF,
   },
 };
