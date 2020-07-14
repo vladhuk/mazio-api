@@ -10,7 +10,7 @@ const getTokenFromHeader: jwt.GetTokenCallback = (req) => {
 };
 
 export const authRequired = jwt({
-  algorithms: ['RS256'],
+  algorithms: ['HS256'],
   secret: process.env.jwt_secret!,
   getToken: getTokenFromHeader,
 });

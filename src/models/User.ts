@@ -1,7 +1,7 @@
 import { Schema, Document, Types, model, HookNextFunction } from 'mongoose';
 import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { generateJwtForUser } from '../utils/jwt';
 
 export interface IUser extends Document {
   username: string;
@@ -14,12 +14,6 @@ export interface IUser extends Document {
 
   validatePassword(password: string): boolean;
   generateJWT(): string;
-}
-
-export interface IJWTPayload {
-  sub: string;
-  exp: number;
-  iat: number;
 }
 
 const userSchema = new Schema(
@@ -43,18 +37,7 @@ userSchema.methods.validatePassword = function (password: string): boolean {
 };
 
 userSchema.methods.generateJWT = function (): string {
-  const iat = new Date();
-  const age = parseInt(process.env.jwt_age!);
-  const exp = new Date(iat);
-  exp.setSeconds(iat.getSeconds() + age);
-
-  const jwtPayload: IJWTPayload = {
-    sub: this._id,
-    exp: exp.getTime() / 1000,
-    iat: iat.getTime() / 1000,
-  };
-
-  return jwt.sign(jwtPayload, process.env.jwt_secret!);
+  return generateJwtForUser(this._id);
 };
 
 userSchema.pre<IUser>('save', function (next: HookNextFunction) {
