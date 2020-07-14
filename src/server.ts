@@ -1,7 +1,5 @@
+import './config';
 import app from './app';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const port = process.env.port || 8080;
 
