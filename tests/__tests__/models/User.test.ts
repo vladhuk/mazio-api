@@ -1,5 +1,6 @@
-import User, { IJWTPayload } from '../../../src/models/User';
+import User from '../../../src/models/User';
 import jwt from 'jsonwebtoken';
+import { IJWTPayload } from '../../../src/utils/jwt';
 
 const testUser = { username: 'username', password: 'password' };
 
@@ -38,7 +39,6 @@ it('save(). When: password is not changed. Expected: not changed salt and passwo
   const hash = user.password;
 
   user.username = 'new_username';
-
   await user.save();
 
   expect(user.password).toBe(hash);
@@ -52,10 +52,10 @@ it('validatePassword(). When: password not hashed. Expected: true.', async () =>
   expect(user.validatePassword(testUser.password)).toBeTruthy();
 });
 
-it('generateJWT(). When: all is ok. Expected: valid jwt string', async () => {
+it('generateJWT(). When: everything is ok. Expected: valid jwt string', async () => {
   const user = new User(testUser);
 
-  const token = await user.generateJWT();
+  const token = user.generateJWT();
 
   expect(token).not.toBe(null);
 
