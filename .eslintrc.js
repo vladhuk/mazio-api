@@ -45,5 +45,12 @@ module.exports = {
     'prettier/prettier': [WARN],
 
     '@typescript-eslint/no-non-null-assertion': OFF,
+
+    'node/no-unpublished-import': [
+      'error',
+      {
+        allowModules: ['supertest'],
+      },
+    ],
   },
 };
