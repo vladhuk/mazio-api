@@ -1,4 +1,5 @@
-import User from '../../../src/models/User';
+import User, { IJWTPayload } from '../../../src/models/User';
+import jwt from 'jsonwebtoken';
 
 const testUser = { username: 'username', password: 'password' };
 
@@ -16,7 +17,6 @@ it('save(). When: password is created. Expected: created salt and hashed passwor
 
 it('save(). When: password is changed. Expected: changed salt and password.', async () => {
   const user = new User(testUser);
-
   await user.save();
 
   const newPassword = 'password1';
@@ -24,7 +24,6 @@ it('save(). When: password is changed. Expected: changed salt and password.', as
   const hash = user.password;
 
   user.password = newPassword;
-
   await user.save();
 
   expect(user.password).not.toBe(hash);
@@ -33,7 +32,6 @@ it('save(). When: password is changed. Expected: changed salt and password.', as
 
 it('save(). When: password is not changed. Expected: not changed salt and password.', async () => {
   const user = new User(testUser);
-
   await user.save();
 
   const salt = user.salt;
@@ -49,8 +47,18 @@ it('save(). When: password is not changed. Expected: not changed salt and passwo
 
 it('validatePassword(). When: password not hashed. Expected: true.', async () => {
   const user = new User(testUser);
-
   await user.save();
 
   expect(user.validatePassword(testUser.password)).toBeTruthy();
+});
+
+it('generateJWT(). When: all is ok. Expected: valid jwt string', async () => {
+  const user = new User(testUser);
+
+  const token = await user.generateJWT();
+
+  expect(token).not.toBe(null);
+
+  const decodedToken = <IJWTPayload>jwt.verify(token, process.env.jwt_secret!);
+  expect(decodedToken.sub).toBe(user._id.toString());
 });
