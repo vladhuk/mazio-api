@@ -1,6 +1,7 @@
 import { Schema, Document, Types, model, HookNextFunction } from 'mongoose';
 import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 export interface IUser extends Document {
   username: string;
@@ -12,6 +13,7 @@ export interface IUser extends Document {
   disliked: IMaze[];
 
   validatePassword(password: string): boolean;
+  generateJWT(): string;
 }
 
 const userSchema = new Schema(
@@ -32,6 +34,22 @@ const userSchema = new Schema(
 userSchema.methods.validatePassword = function (password: string): boolean {
   const hash = hashSync(password, this.salt);
   return compareSync(password, hash);
+};
+
+userSchema.methods.generateJWT = function (): string {
+  const iat = new Date();
+  const age = parseInt(process.env.jwt_age!);
+  const exp = new Date(iat);
+  exp.setMilliseconds(iat.getMilliseconds() + age);
+
+  return jwt.sign(
+    {
+      sub: this._id,
+      exp,
+      iat,
+    },
+    process.env.jwt_secret!
+  );
 };
 
 userSchema.pre<IUser>('save', function (next: HookNextFunction) {
