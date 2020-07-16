@@ -7,8 +7,6 @@ import roomsRouter from './rooms';
 
 const router = Router();
 
-router.use('/api');
-
 router.use('/auth', authRouter);
 router.use('/mazes', mazesRouter);
 router.use('/friends', friendsRouter);
