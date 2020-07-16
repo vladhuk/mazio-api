@@ -18,7 +18,7 @@ it('authRequired(). When: jwt is valid. Expect: user field in request', async ()
   const decodedBody = <IJWTPayload>jwt.decode(encodedToken);
   const bearerToken = `Bearer ${encodedToken}`;
 
-  await request(app)
+  return request(app)
     .get('/')
     .set('Authorization', bearerToken)
     .expect(200)
