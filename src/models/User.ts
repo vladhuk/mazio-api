@@ -3,7 +3,11 @@ import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
 
-export interface IUser extends Document {
+export interface IJsonUser {
+  username: string;
+}
+
+export interface IUser extends Document, IJsonUser {
   username: string;
   password: string;
   salt: string;
@@ -13,7 +17,8 @@ export interface IUser extends Document {
   disliked: IMaze[];
 
   validatePassword(password: string): boolean;
-  generateJWT(): string;
+  generateJwt(): string;
+  toJson(): IJsonUser;
 }
 
 const userSchema = new Schema(
@@ -36,8 +41,14 @@ userSchema.methods.validatePassword = function (password: string): boolean {
   return compareSync(password, hash);
 };
 
-userSchema.methods.generateJWT = function (): string {
+userSchema.methods.generateJwt = function (): string {
   return generateJwtForUser(this._id);
+};
+
+userSchema.methods.toJson = function (): IJsonUser {
+  return {
+    username: this.username,
+  };
 };
 
 userSchema.pre<IUser>('save', function (next: HookNextFunction) {
