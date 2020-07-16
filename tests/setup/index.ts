@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import '../../src/config/passport';
 import mongoose from 'mongoose';
 
 dotenv.config({ path: `${process.cwd()}/.env.test` });

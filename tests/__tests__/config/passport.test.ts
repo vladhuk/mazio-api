@@ -1,4 +1,3 @@
-import '../../../src/config/passport';
 import { authenticate } from 'passport';
 import User from '../../../src/models/User';
 import express from 'express';
