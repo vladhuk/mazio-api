@@ -1,5 +1,5 @@
 declare namespace Express {
   export interface Request {
-    user?: import('../src/models/User').IJWTPayload;
+    user?: import('../src/models/User').IJwtPayload;
   }
 }

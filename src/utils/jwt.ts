@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export interface IJWTPayload {
+export interface IJwtPayload {
   sub: string;
   exp: number;
   iat: number;
@@ -12,7 +12,7 @@ export function generateJwtForUser(userId: string): string {
   const exp = new Date(iat);
   exp.setSeconds(iat.getSeconds() + age);
 
-  const jwtPayload: IJWTPayload = {
+  const jwtPayload: IJwtPayload = {
     sub: userId,
     exp: exp.getTime() / 1000,
     iat: iat.getTime() / 1000,
