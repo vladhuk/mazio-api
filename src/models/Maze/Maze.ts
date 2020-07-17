@@ -1,4 +1,4 @@
-import { Schema, Document, Types, model } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 import { values } from '../../utils/enum';
 import InfoSchema, { IInfo } from './subdocs/InfoSchema';
 import StructureSchema, { IStructure } from './subdocs/StructureSchema';
@@ -23,7 +23,7 @@ enum Type {
 const mazeSchema = new Schema(
   {
     title: { type: String, required: true, unique: true },
-    owner: { type: Types.ObjectId, ref: 'User', required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     likes: { type: Number, min: 0, default: 0 },
     dislikes: { type: Number, min: 0, default: 0 },
     games: { type: Number, min: 0, default: 0 },

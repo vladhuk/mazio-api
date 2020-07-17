@@ -1,4 +1,4 @@
-import { Schema, Document, Types, model, HookNextFunction } from 'mongoose';
+import { Schema, Document, model, HookNextFunction } from 'mongoose';
 import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
@@ -26,10 +26,10 @@ const userSchema = new Schema(
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     salt: { type: String },
-    friends: [{ type: Types.ObjectId, ref: 'User' }],
-    ignored: [{ type: Types.ObjectId, ref: 'User' }],
-    liked: [{ type: Types.ObjectId, ref: 'Maze' }],
-    disliked: [{ type: Types.ObjectId, ref: 'Maze' }],
+    friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    ignored: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    liked: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
+    disliked: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
   },
   {
     timestamps: true,

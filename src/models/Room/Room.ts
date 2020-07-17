@@ -1,4 +1,4 @@
-import { Schema, Document, Types, model } from 'mongoose';
+import { Schema, Document, model } from 'mongoose';
 import { IUser } from '../User';
 import { IMember } from './subdocs/MemberSchema';
 import { IMaze } from '../Maze';
@@ -22,11 +22,11 @@ enum Type {
 const roomSchema = new Schema({
   title: String,
   description: String,
-  owner: { type: Types.ObjectId, ref: 'User', required: true },
+  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   type: { type: Number, enum: values(Type), default: Type.PRIVATE },
-  members: [{ type: Types.ObjectId, ref: 'User' }],
-  maze: { type: Types.ObjectId, ref: 'Maze' },
-  requests: [{ type: Types.ObjectId, ref: 'User' }],
+  members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  maze: { type: Schema.Types.ObjectId, ref: 'Maze' },
+  requests: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
 export default model<IRoom>('Room', roomSchema);
