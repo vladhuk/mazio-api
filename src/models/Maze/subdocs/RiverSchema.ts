@@ -8,7 +8,7 @@ export interface IRiver {
 }
 
 export default new Schema({
-  start: LocationSchema,
-  end: LocationSchema,
+  start: { type: LocationSchema, required: true },
+  end: { type: LocationSchema, required: true },
   cells: [LocationSchema],
 });

@@ -7,6 +7,6 @@ export interface IPit {
 }
 
 export default new Schema({
-  in: LocationSchema,
-  out: LocationSchema,
+  in: { type: LocationSchema, required: true },
+  out: { type: LocationSchema, required: true },
 });

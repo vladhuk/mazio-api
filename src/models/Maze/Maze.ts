@@ -28,8 +28,8 @@ const mazeSchema = new Schema(
     dislikes: { type: Number, min: 0, default: 0 },
     games: { type: Number, min: 0, default: 0 },
     type: { type: Number, enum: values(Type), default: Type.DRAFT },
-    info: InfoSchema,
-    structure: StructureSchema,
+    info: { type: InfoSchema, required: true },
+    structure: { type: StructureSchema, required: true },
   },
   {
     timestamps: true,

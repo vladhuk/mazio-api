@@ -22,7 +22,7 @@ enum Type {
 const roomSchema = new Schema({
   title: String,
   description: String,
-  owner: { type: Types.ObjectId, ref: 'User' },
+  owner: { type: Types.ObjectId, ref: 'User', required: true },
   type: { type: Number, enum: values(Type), default: Type.PRIVATE },
   members: [{ type: Types.ObjectId, ref: 'User' }],
   maze: { type: Types.ObjectId, ref: 'Maze' },

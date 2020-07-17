@@ -21,16 +21,16 @@ export interface IStructure {
 }
 
 export default new Schema({
-  size: SizeSchema,
-  walls: [LocationSchema],
+  size: { type: SizeSchema, required: true },
+  walls: [{ type: LocationSchema, required: true }],
   rubberWalls: [LocationSchema],
   translucentWalls: [LocationSchema],
-  outputs: [LocationSchema],
+  outputs: [{ type: LocationSchema, required: true }],
   pits: [PitSchema],
   arsenals: [LocationSchema],
-  treasure: LocationSchema,
+  treasure: { type: LocationSchema, required: true },
   fakeTreasures: [LocationSchema],
-  spawns: [LocationSchema],
+  spawns: [{ type: LocationSchema, required: true }],
   rivers: [RiverSchema],
   traps: [LocationSchema],
   ladders: [LocationSchema],

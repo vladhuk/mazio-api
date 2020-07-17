@@ -6,6 +6,6 @@ export interface ISize {
 }
 
 export default new Schema({
-  height: { type: Number, min: 1, max: 100 },
-  width: { type: Number, min: 1, max: 100 },
+  height: { type: Number, min: 1, max: 100, required: true },
+  width: { type: Number, min: 1, max: 100, required: true },
 });

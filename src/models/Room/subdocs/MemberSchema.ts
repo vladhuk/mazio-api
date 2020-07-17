@@ -14,6 +14,6 @@ enum Role {
 }
 
 export default new Schema({
-  user: { type: Types.ObjectId, ref: 'User' },
+  user: { type: Types.ObjectId, ref: 'User', required: true },
   role: { type: Number, enum: values(Role), default: Role.PARTICIPANT },
 });

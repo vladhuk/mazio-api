@@ -15,7 +15,7 @@ enum Direction {
 }
 
 export default new Schema({
-  x: { type: Number, min: 0 },
-  y: { type: Number, min: 0 },
+  x: { type: Number, min: 0, required: true },
+  y: { type: Number, min: 0, required: true },
   direction: { type: Number, enum: values(Direction) },
 });
