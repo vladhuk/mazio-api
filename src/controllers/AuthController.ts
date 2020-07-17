@@ -11,7 +11,7 @@ export const signUp: RequestHandler = (req, res) => {
 
   registerUser(req.body.username, req.body.password)
     .then((user) => {
-      return res.json(new JwtAuthResponse(user.toJson(), user.generateJwt()));
+      return res.json(new JwtAuthResponse(user.toDto(), user.generateJwt()));
     })
     .catch(() => res.status(500).send('Error creating user'));
 };
@@ -26,7 +26,7 @@ export const signIn: RequestHandler = (req, res, next) => {
       return next(err);
     }
     if (user) {
-      return res.json(new JwtAuthResponse(user.toJson(), user.generateJwt()));
+      return res.json(new JwtAuthResponse(user.toDto(), user.generateJwt()));
     }
     return res.status(400).send(info);
   })(req, res, next);

@@ -1,13 +1,14 @@
-import { Schema, Document, model, HookNextFunction } from 'mongoose';
+import { Schema, Document, model, HookNextFunction, Types } from 'mongoose';
 import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
 
-export interface IJsonUser {
+export interface IUserDto {
+  _id: Types.ObjectId;
   username: string;
 }
 
-export interface IUser extends Document, IJsonUser {
+export interface IUser extends Document {
   username: string;
   password: string;
   salt: string;
@@ -18,7 +19,7 @@ export interface IUser extends Document, IJsonUser {
 
   validatePassword(password: string): boolean;
   generateJwt(): string;
-  toJson(): IJsonUser;
+  toDto(): IUserDto;
 }
 
 const userSchema = new Schema(
@@ -45,8 +46,9 @@ userSchema.methods.generateJwt = function (): string {
   return generateJwtForUser(this._id);
 };
 
-userSchema.methods.toJson = function (): IJsonUser {
+userSchema.methods.toDto = function (): IUserDto {
   return {
+    _id: this._id,
     username: this.username,
   };
 };

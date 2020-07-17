@@ -1,11 +1,11 @@
-import { IJsonUser } from '../models/User';
+import { IUserDto } from '../models/User';
 
 export default class JwtAuthResponse {
-  private user: IJsonUser;
+  private user: IUserDto;
   private token: string;
   private tokenType = 'Bearer';
 
-  constructor(user: IJsonUser, token: string) {
+  constructor(user: IUserDto, token: string) {
     this.user = user;
     this.token = token;
   }
