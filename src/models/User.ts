@@ -1,10 +1,17 @@
-import { Schema, Document, model, HookNextFunction, Types } from 'mongoose';
+import {
+  Schema,
+  Document,
+  model,
+  HookNextFunction,
+  Types,
+  Model,
+} from 'mongoose';
 import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
 
 export interface IUserDto {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   username: string;
 }
 
@@ -12,14 +19,18 @@ export interface IUser extends Document {
   username: string;
   password: string;
   salt: string;
-  friends: IUser[];
-  ignored: IUser[];
-  liked: IMaze[];
-  disliked: IMaze[];
+  friends: Types.Array<IUser>;
+  ignoredUsers: Types.Array<IUser>;
+  likedMazes: Types.Array<IMaze>;
+  dislikedMazes: Types.Array<IMaze>;
 
   validatePassword(password: string): boolean;
   generateJwt(): string;
   toDto(): IUserDto;
+}
+
+interface IUserModel extends Model<IUser> {
+  leanToDto(user: IUser): IUserDto;
 }
 
 const userSchema = new Schema(
@@ -28,9 +39,9 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     salt: { type: String },
     friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    ignored: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    liked: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
-    disliked: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
+    ignoredUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    likedMazes: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
+    dislikedMazes: [{ type: Schema.Types.ObjectId, ref: 'Maze' }],
   },
   {
     timestamps: true,
@@ -48,8 +59,15 @@ userSchema.methods.generateJwt = function (): string {
 
 userSchema.methods.toDto = function (): IUserDto {
   return {
-    _id: this._id,
+    id: this._id,
     username: this.username,
+  };
+};
+
+userSchema.statics.leanToDto = function (user: IUser): IUserDto {
+  return {
+    id: user._id,
+    username: user.username,
   };
 };
 
@@ -61,4 +79,4 @@ userSchema.pre<IUser>('save', function (next: HookNextFunction) {
   next();
 });
 
-export default model<IUser>('User', userSchema);
+export default model<IUser, IUserModel>('User', userSchema);

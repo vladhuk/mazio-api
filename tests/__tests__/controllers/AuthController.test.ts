@@ -14,7 +14,7 @@ it('signUp(). When: username and password are correct. Expected: Created user, 2
   expect(response.body.token).not.toBeNull();
   expect(!!response.body.user).toBeTruthy();
   expect(response.body.user.username).toBe(testUser.username);
-  expect(await User.exists({ _id: response.body.user._id })).toBeTruthy();
+  expect(await User.exists({ _id: response.body.user.id })).toBeTruthy();
 });
 
 it('signIn(). When: user exists. Expected: 200 and correct response body', async () => {
