@@ -3,22 +3,29 @@ import { authenticate } from 'passport';
 import { IUser } from '../models/User';
 import { registerUser } from '../services/AuthService';
 import JwtAuthResponse from '../payload/JwtAuthResponse';
+import HttpStatus from 'http-status-codes';
 
 export const signUp: RequestHandler = (req, res) => {
   if (!req.body.username || !req.body.password) {
-    return res.status(400).send('Blank username or password');
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send('Blank username or password');
   }
 
   registerUser(req.body.username, req.body.password)
     .then((user) => {
       return res.json(new JwtAuthResponse(user.toDto(), user.generateJwt()));
     })
-    .catch(() => res.status(500).send('Error creating user'));
+    .catch(() =>
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Error creating user')
+    );
 };
 
 export const signIn: RequestHandler = (req, res, next) => {
   if (!req.body.username || !req.body.password) {
-    return res.status(400).send('Blank username or password');
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .send('Blank username or password');
   }
 
   authenticate('local', { session: false }, (err, user: IUser, info) => {
@@ -28,6 +35,6 @@ export const signIn: RequestHandler = (req, res, next) => {
     if (user) {
       return res.json(new JwtAuthResponse(user.toDto(), user.generateJwt()));
     }
-    return res.status(400).send(info);
+    return res.status(HttpStatus.BAD_REQUEST).send(info);
   })(req, res, next);
 };
