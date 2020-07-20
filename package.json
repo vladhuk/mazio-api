@@ -4,7 +4,7 @@
   "main": "src/server.ts",
   "license": "MIT",
   "engines": {
-    "node": ">=14.4.0"
+    "node": ">=10.21.0"
   },
   "scripts": {
     "start": "ts-node src/server.ts",
