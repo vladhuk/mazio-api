@@ -1,4 +1,4 @@
-import { Schema, Document, model } from 'mongoose';
+import { Schema, Document, model, Types } from 'mongoose';
 import { values } from '../../utils/enum';
 import InfoSchema, { IInfo } from './subdocs/InfoSchema';
 import StructureSchema, { IStructure } from './subdocs/StructureSchema';
@@ -6,7 +6,7 @@ import { IUser } from '../User';
 
 export interface IMaze extends Document {
   title: string;
-  owner: IUser;
+  owner: IUser | Types.ObjectId;
   likes: number;
   dislikes: number;
   games: number;
@@ -15,7 +15,7 @@ export interface IMaze extends Document {
   structure: IStructure;
 }
 
-enum Type {
+export enum Type {
   DRAFT,
   PUBLISHED,
 }
