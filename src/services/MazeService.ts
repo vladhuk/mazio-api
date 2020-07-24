@@ -3,6 +3,7 @@ import { Type as MazeType, IMaze } from '../models/Maze';
 import Maze from '../models/Maze/Maze';
 import User from '../models/User';
 import MazeNotFoundError from '../errors/MazeNotFoundError';
+import UserNotFoundError from '../errors/UserNotFoundError';
 
 export async function getMazesByOwnerAndType(
   ownerId: Types.ObjectId,
@@ -17,11 +18,15 @@ export async function createMaze(
 ): Promise<IMaze> {
   const owner = await User.findById(ownerId);
 
+  if (!owner) {
+    throw new UserNotFoundError(ownerId);
+  }
+
   const newMaze = new Maze({
     title: maze.title,
     info: maze.info,
     structure: maze.structure,
-    owner,
+    owner: owner._id,
     type: MazeType.DRAFT,
   });
 
@@ -63,7 +68,9 @@ export async function incrementLikes(
     mazeId,
     { $inc: { likes: diff } },
     { new: true }
-  ).select({ _id: false, likes: true });
+  )
+    .select({ _id: false, likes: true })
+    .lean();
 
   if (!maze) {
     throw new MazeNotFoundError(mazeId);
@@ -78,9 +85,11 @@ export async function incrementDislikes(
 ): Promise<number> {
   const maze = await Maze.findByIdAndUpdate(
     mazeId,
-    { $inc: { likes: diff } },
+    { $inc: { dislikes: diff } },
     { new: true }
-  ).select({ _id: false, dislikes: true });
+  )
+    .select({ _id: false, dislikes: true })
+    .lean();
 
   if (!maze) {
     throw new MazeNotFoundError(mazeId);
