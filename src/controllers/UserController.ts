@@ -3,12 +3,12 @@ import * as userService from '../services/UserService';
 import { Types } from 'mongoose';
 import HttpStatus from 'http-status-codes';
 import UserNotFoundError from '../errors/UserNotFoundError';
-import defaultLogger from '../utils/logger';
+import logger from '../utils/logger';
 
-const logger = defaultLogger.child({ service: 'UserController' });
+const log = logger.child({ service: 'UserController' });
 
 function defaultErrorHandler(err: Error, res: Response) {
-  logger.error(err);
+  log.error(err);
 
   if (err instanceof UserNotFoundError) {
     return res.status(HttpStatus.NOT_FOUND).send(err.message);
