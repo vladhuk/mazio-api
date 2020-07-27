@@ -11,7 +11,7 @@ import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
 
 export interface IUserDto {
-  id: Types.ObjectId;
+  id: string;
   username: string;
 }
 
@@ -23,6 +23,8 @@ export interface IUser extends Document {
   ignoredUsers: Types.Array<IUser>;
   likedMazes: Types.Array<IMaze>;
   dislikedMazes: Types.Array<IMaze>;
+  createdAt: Date;
+  updatedAt: Date;
 
   validatePassword(password: string): boolean;
   generateJwt(): string;
@@ -30,7 +32,7 @@ export interface IUser extends Document {
 }
 
 interface IUserModel extends Model<IUser> {
-  leanToDto(user: IUser): IUserDto;
+  toDto(user: IUser): IUserDto;
 }
 
 const userSchema = new Schema(
@@ -57,18 +59,19 @@ userSchema.methods.generateJwt = function (): string {
   return generateJwtForUser(this._id);
 };
 
-userSchema.methods.toDto = function (): IUserDto {
-  return {
-    id: this._id,
-    username: this.username,
-  };
-};
-
-userSchema.statics.leanToDto = function (user: IUser): IUserDto {
+function convertToDto(user: IUser): IUserDto {
   return {
     id: user._id,
     username: user.username,
   };
+}
+
+userSchema.methods.toDto = function (this: IUser): IUserDto {
+  return convertToDto(this);
+};
+
+userSchema.statics.toDto = function (user: IUser): IUserDto {
+  return convertToDto(user);
 };
 
 userSchema.pre<IUser>('save', function (next: HookNextFunction) {
