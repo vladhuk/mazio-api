@@ -10,13 +10,11 @@ import { IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
 
-export interface IUserDto {
-  id: string;
+interface IUserBase {
   username: string;
 }
 
-export interface IUser extends Document {
-  username: string;
+export interface IUser extends IUserBase, Document {
   password: string;
   salt: string;
   friends: Types.Array<IUser>;
@@ -29,6 +27,10 @@ export interface IUser extends Document {
   validatePassword(password: string): boolean;
   generateJwt(): string;
   toDto(): IUserDto;
+}
+
+export interface IUserDto extends IUserBase {
+  id: string;
 }
 
 interface IUserModel extends Model<IUser> {
