@@ -9,5 +9,9 @@ router.delete('/:id/friends/:friendId', userController.deleteFriend);
 router.get('/:id/ignored', userController.getIgnoredUsers);
 router.post('/:id/ignored', userController.addIgnoredUser);
 router.delete('/:id/ignored/:ignoredUserId', userController.deleteIgnoredUser);
+router.post('/:id/liked-mazes', userController.addLikedMaze);
+router.delete('/:id/liked-mazes/:mazeId', userController.removeLikedMaze);
+router.post('/:id/disiked-mazes', userController.addDislikedMaze);
+router.delete('/:id/disliked-mazes/:mazeId', userController.removeDislikedMaze);
 
 export default router;
