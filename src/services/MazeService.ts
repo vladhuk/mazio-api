@@ -9,16 +9,24 @@ export async function getMazesByOwnerAndType(
   ownerId: Types.ObjectId,
   mazeType: MazeType
 ): Promise<IMaze[]> {
-  return Maze.find({ owner: ownerId, type: mazeType }).lean();
+  const isUserExist = await User.exists({ _id: ownerId });
+
+  if (!isUserExist) {
+    throw new UserNotFoundError(ownerId);
+  }
+
+  return Maze.find({ owner: ownerId, type: mazeType })
+    .populate({ path: 'owner', select: { username: true } })
+    .lean();
 }
 
 export async function createMaze(
   maze: IMaze,
   ownerId: Types.ObjectId
 ): Promise<IMaze> {
-  const owner = await User.findById(ownerId);
+  const isUserExists = await User.exists({ _id: ownerId });
 
-  if (!owner) {
+  if (!isUserExists) {
     throw new UserNotFoundError(ownerId);
   }
 
@@ -26,7 +34,7 @@ export async function createMaze(
     title: maze.title,
     info: maze.info,
     structure: maze.structure,
-    owner: owner._id,
+    owner: ownerId,
     type: MazeType.DRAFT,
   });
 
