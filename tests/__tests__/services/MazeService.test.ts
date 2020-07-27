@@ -1,5 +1,5 @@
 import Maze, { Type } from '../../../src/models/Maze';
-import User from '../../../src/models/User';
+import User, { IUser } from '../../../src/models/User';
 import {
   getMazesByOwnerAndType,
   createMaze,
@@ -7,13 +7,9 @@ import {
   incrementDislikes,
 } from '../../../src/services/MazeService';
 
-const testUser = new User({
-  username: 'testusername',
-  password: 'testpassword',
-});
+let testUser: IUser;
 
 const testMazeSnippet = {
-  owner: testUser._id,
   info: {
     bullets: 0,
     bulletsOnStart: 0,
@@ -31,7 +27,16 @@ const testMazeSnippet = {
 
 const testMaze = { ...testMazeSnippet, title: 'testMaze1' };
 
+beforeEach(() => {
+  testUser = new User({
+    username: 'testusername',
+    password: 'testpassword',
+  });
+  testMazeSnippet.owner = testUser._id;
+});
+
 it('getMazesByOwnerAndType(). When: type is published mazes. Expected: only published mazes', async () => {
+  await testUser.save();
   const publishedMaze = new Maze({ ...testMaze, type: Type.PUBLISHED });
   const draftMaze = new Maze({ ...testMaze, title: 'draftMaze' });
   await Maze.create(publishedMaze, draftMaze);
@@ -42,14 +47,16 @@ it('getMazesByOwnerAndType(). When: type is published mazes. Expected: only publ
   );
 
   expect(publishedMazes.length).toBe(1);
-  expect(publishedMazes[0]._id.toString()).toBe(publishedMaze._id.toString());
+  expect(publishedMazes[0]._id).toEqual(publishedMaze._id);
+  expect((<IUser>publishedMaze.owner)._id).toEqual(testUser._id);
 });
 
 it('createMaze(). When: owner exists. Expect: correct creating', async () => {
   await testUser.save();
   const maze = await createMaze(new Maze(testMaze), testUser._id);
 
-  expect(maze.owner.toString()).toBe(testUser._id.toString());
+  expect(maze._id).toBeDefined();
+  expect((<IUser>maze.owner)._id).toEqual(testUser._id);
 });
 
 it('incrementLikes(). When: maze exist. Expect: correct increment', async () => {

@@ -23,7 +23,7 @@ it('getFriends(). When: user and friend exist. Expect: list with friend', async 
 
   expect(friends).not.toBeNull();
   expect(friends.length).toBe(1);
-  expect(friends[0]).toEqual(friendUser.toDto());
+  expect(friends[0]._id).toEqual(friendUser._id);
 });
 
 it('getFriends(). When: user does not exist. Expect: UserNotFoundError', () => {
@@ -41,7 +41,7 @@ it('addFriend(). When: user exists and does not have this friend. Expect: add fr
 
   expect(friends).not.toBeNull();
   expect(friends.length).toBe(1);
-  expect(friends[0]).toEqual(friendUser.toDto());
+  expect(friends[0]._id).toEqual(friendUser._id);
 });
 
 it('addFriend(). When: friend does not exist. Expect: UserNotFoundError', async () => {
@@ -87,7 +87,7 @@ it('getIgnoredUsers(). When: user and and inored user exist. Expect: list with i
 
   expect(ignoredUsers).not.toBeNull();
   expect(ignoredUsers.length).toBe(1);
-  expect(ignoredUsers[0]).toEqual(ignoredUser.toDto());
+  expect(ignoredUsers[0]._id).toEqual(ignoredUser._id);
 });
 
 it('addIgnoredUser(). When: user exists and does not have this ignored user. Expect: add ignored user', async () => {
@@ -100,7 +100,7 @@ it('addIgnoredUser(). When: user exists and does not have this ignored user. Exp
 
   expect(ignoredUsers).not.toBeNull();
   expect(ignoredUsers.length).toBe(1);
-  expect(ignoredUsers[0]).toEqual(ignoredUser.toDto());
+  expect(ignoredUsers[0]._id).toEqual(ignoredUser._id);
 });
 
 it('deleteIgnoredUser(). When: ignored user exists. Expected: deleted ignored user', async () => {
