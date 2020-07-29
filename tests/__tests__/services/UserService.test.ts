@@ -13,6 +13,35 @@ import { Types } from 'mongoose';
 const testUser1 = { username: 'testusername1', password: 'testpassword1' };
 const testUser2 = { username: 'testusername2', password: 'testpassword2' };
 
+let testUserModel;
+
+const testMazeSnippet = {
+  owner: {},
+  info: {
+    bullets: 0,
+    bulletsOnStart: 0,
+    granades: 0,
+    granadesOnStart: 0,
+  },
+  structure: {
+    size: { height: 5, width: 5 },
+    walls: [],
+    outputs: [],
+    treasure: { x: 0, y: 0 },
+    spawns: [],
+  },
+};
+
+const testMaze = { ...testMazeSnippet, title: 'testMaze1' };
+
+beforeEach(() => {
+  testUserModel = new User({
+    username: 'testusername',
+    password: 'testpassword',
+  });
+  testMaze.owner = testUserModel._id;
+});
+
 it('getFriends(). When: user and friend exist. Expect: list with friend', async () => {
   const friendUser = new User(testUser2);
   await friendUser.save();
@@ -113,4 +142,28 @@ it('deleteIgnoredUser(). When: ignored user exists. Expected: deleted ignored us
   const ignoredUsers = await getIgnoredUsers(user._id);
 
   expect(ignoredUsers.length).toBe(0);
+});
+
+it('addLikedMazeAndUpdateMazeLikesNumber(). When: maze is not liked. Expected: new liked maze and increase number of likes', async () => {
+
+});
+
+it('addLikedMazeAndUpdateMazeLikesNumber(). When: maze is liked. Expected: not added liked maze and not increased number of likes', async () => {
+
+});
+
+it('addLikedMazeAndUpdateMazeLikesNumber(). When: user does not exist. Expected: UserNotFoundError', async () => {
+
+});
+
+it('addLikedMazeAndUpdateMazeLikesNumber(). When: maze does not exist. Expected: MazeNotFoundError', async () => {
+
+});
+
+it('removeDislikedMazeAndUpdateMazeDislikesNumber(). When: maze is not disliked. Expected: new disliked maze and increase number of dislikes', async () => {
+
+});
+
+it('removeDislikedMazeAndUpdateMazeDislikesNumber(). When: maze is disliked. Expected: not added disliked maze and not increased number of dislikes', async () => {
+
 });
