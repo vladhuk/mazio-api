@@ -10,6 +10,7 @@ import {
 let testUser: IUser;
 
 const testMazeSnippet = {
+  owner: {},
   info: {
     bullets: 0,
     bulletsOnStart: 0,
@@ -32,7 +33,7 @@ beforeEach(() => {
     username: 'testusername',
     password: 'testpassword',
   });
-  testMazeSnippet.owner = testUser._id;
+  testMaze.owner = testUser._id;
 });
 
 it('getMazesByOwnerAndType(). When: type is published mazes. Expected: only published mazes', async () => {
