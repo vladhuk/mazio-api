@@ -14,7 +14,7 @@ function defaultErrorHandler(err: Error, res: Response) {
   if (err instanceof UserNotFoundError) {
     return res.status(HttpStatus.NOT_FOUND).send(err.message);
   }
-  return res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
 }
 
 export const getFriends: RequestHandler = (req, res) => {
@@ -39,6 +39,7 @@ export const deleteFriend: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.params.friendId)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -64,6 +65,7 @@ export const deleteIgnoredUser: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.params.ignoredUserId)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -73,6 +75,7 @@ export const addLikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.body.id)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -82,6 +85,7 @@ export const removeLikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.params.mazeId)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -91,6 +95,7 @@ export const addDislikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.body.id)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -100,5 +105,6 @@ export const removeDislikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.params.mazeId)
     )
+    .then(() => res.end())
     .catch((err) => defaultErrorHandler(err, res));
 };
