@@ -184,7 +184,8 @@ export async function addLikedMazeAndUpdateMazeLikesNumber(
   }
 
   await incrementLikes(mazeId, 1);
-  await user.update({ $push: { likedMazes: mazeId } }).lean();
+  user.likedMazes.push(mazeId);
+  await user.save();
 
   return user.likedMazes;
 }
@@ -205,7 +206,8 @@ export async function removeLikedMazeAndUpdateMazeLikesNumber(
   }
 
   await incrementLikes(mazeId, -1);
-  await user.update({ $pull: { likedMazes: mazeId } }).lean();
+  user.likedMazes.pull(mazeId);
+  await user.save();
 
   return user.likedMazes;
 }
@@ -226,7 +228,8 @@ export async function addDislikedMazeAndUpdateMazeDislikesNumber(
   }
 
   await incrementDislikes(mazeId, 1);
-  await user.update({ $push: { dislikedMazes: mazeId } }).lean();
+  user.dislikedMazes.push(mazeId);
+  await user.save();
 
   return user.dislikedMazes;
 }
@@ -247,7 +250,8 @@ export async function removeDislikedMazeAndUpdateMazeDislikesNumber(
   }
 
   await incrementDislikes(mazeId, -1);
-  await user.update({ $pull: { dislikedMazes: mazeId } }).lean();
+  user.dislikedMazes.pull(mazeId);
+  await user.save();
 
   return user.dislikedMazes;
 }
