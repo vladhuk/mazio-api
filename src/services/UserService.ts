@@ -2,8 +2,11 @@ import User, { IUser } from '../models/User';
 import UserNotFoundError from '../errors/UserNotFoundError';
 import { Types } from 'mongoose';
 import logger from '../utils/logger';
-import { incrementLikes, incrementDislikes } from './MazeService';
-import { IMaze } from '../models/Maze';
+import * as mazeService from './MazeService';
+import {
+  defaultPopulateOptions as mazePopulateOptions,
+  IMaze,
+} from '../models/Maze';
 
 const log = logger.child({ servise: 'UserService' });
 
@@ -141,7 +144,7 @@ async function getUserWithLikedMazes(userId: Types.ObjectId): Promise<IUser> {
     .select({ likedMazes: true })
     .populate({
       path: 'likedMazes',
-      populate: { path: 'owner', select: { username: true } },
+      populate: mazePopulateOptions,
     });
 
   if (!user) {
@@ -158,7 +161,7 @@ async function getUserWithDislikedMazes(
     .select({ dislikedMazes: true })
     .populate({
       path: 'dislikedMazes',
-      populate: { path: 'owner', select: { username: true } },
+      populate: mazePopulateOptions,
     });
 
   if (!user) {
@@ -183,8 +186,11 @@ export async function addLikedMazeAndUpdateMazeLikesNumber(
     return user.likedMazes;
   }
 
-  await incrementLikes(mazeId, 1);
-  user.likedMazes.push(mazeId);
+  await mazeService.incrementLikes(mazeId, 1);
+
+  const likedMaze = await mazeService.getMazeById(mazeId);
+
+  user.likedMazes.push(likedMaze);
   await user.save();
 
   return user.likedMazes;
@@ -205,7 +211,7 @@ export async function removeLikedMazeAndUpdateMazeLikesNumber(
     return user.likedMazes;
   }
 
-  await incrementLikes(mazeId, -1);
+  await mazeService.incrementLikes(mazeId, -1);
   user.likedMazes.pull(mazeId);
   await user.save();
 
@@ -227,8 +233,11 @@ export async function addDislikedMazeAndUpdateMazeDislikesNumber(
     return user.dislikedMazes;
   }
 
-  await incrementDislikes(mazeId, 1);
-  user.dislikedMazes.push(mazeId);
+  await mazeService.incrementDislikes(mazeId, 1);
+
+  const dislikedMaze = await mazeService.getMazeById(mazeId);
+
+  user.dislikedMazes.push(dislikedMaze);
   await user.save();
 
   return user.dislikedMazes;
@@ -249,7 +258,7 @@ export async function removeDislikedMazeAndUpdateMazeDislikesNumber(
     return user.dislikedMazes;
   }
 
-  await incrementDislikes(mazeId, -1);
+  await mazeService.incrementDislikes(mazeId, -1);
   user.dislikedMazes.pull(mazeId);
   await user.save();
 
