@@ -1,9 +1,19 @@
 import { Types } from 'mongoose';
 import { Type as MazeType, IMaze } from '../models/Maze';
-import Maze from '../models/Maze/Maze';
+import Maze, { defaultPopulateOptions } from '../models/Maze/Maze';
 import User from '../models/User';
 import MazeNotFoundError from '../errors/MazeNotFoundError';
 import UserNotFoundError from '../errors/UserNotFoundError';
+
+export async function getMazeById(id: Types.ObjectId): Promise<IMaze> {
+  const maze = await Maze.findById(id).populate(defaultPopulateOptions);
+
+  if (!maze) {
+    throw new MazeNotFoundError(id);
+  }
+
+  return maze;
+}
 
 export async function getMazesByOwnerAndType(
   ownerId: Types.ObjectId,
@@ -16,7 +26,7 @@ export async function getMazesByOwnerAndType(
   }
 
   return Maze.find({ owner: ownerId, type: mazeType })
-    .populate({ path: 'owner', select: { username: true } })
+    .populate(defaultPopulateOptions)
     .lean();
 }
 
@@ -45,11 +55,7 @@ export async function updateMaze(
   mazeId: Types.ObjectId,
   maze: IMaze
 ): Promise<IMaze> {
-  const currentMaze = await Maze.findById(mazeId).select({
-    title: true,
-    info: true,
-    structure: true,
-  });
+  const currentMaze = await getMazeById(mazeId);
 
   if (!currentMaze) {
     throw new MazeNotFoundError(mazeId);
