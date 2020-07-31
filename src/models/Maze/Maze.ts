@@ -1,4 +1,11 @@
-import { Schema, Document, model, Types, Model } from 'mongoose';
+import {
+  Schema,
+  Document,
+  model,
+  Types,
+  Model,
+  QueryPopulateOptions,
+} from 'mongoose';
 import { values } from '../../utils/enum';
 import InfoSchema, { IInfo } from './subdocs/InfoSchema';
 import StructureSchema, { IStructure } from './subdocs/StructureSchema';
@@ -79,6 +86,11 @@ mazeSchema.methods.toDto = function (this: IMaze): IMazeDto {
 
 mazeSchema.statics.toDto = function (maze: IMaze): IMazeDto {
   return convertToDto(maze);
+};
+
+export const defaultPopulateOptions: QueryPopulateOptions = {
+  path: 'owner',
+  select: { username: true },
 };
 
 export default model<IMaze, IMazeModel>('Maze', mazeSchema);
