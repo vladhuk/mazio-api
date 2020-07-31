@@ -171,6 +171,11 @@ async function getUserWithDislikedMazes(
   return user;
 }
 
+export async function getLikedMazes(userId: Types.ObjectId): Promise<IMaze[]> {
+  const user = await getUserWithLikedMazes(userId);
+  return user.likedMazes;
+}
+
 export async function addLikedMazeAndUpdateMazeLikesNumber(
   userId: Types.ObjectId,
   mazeId: Types.ObjectId
@@ -216,6 +221,13 @@ export async function removeLikedMazeAndUpdateMazeLikesNumber(
   await user.save();
 
   return user.likedMazes;
+}
+
+export async function getDislikedMazes(
+  userId: Types.ObjectId
+): Promise<IMaze[]> {
+  const user = await getUserWithDislikedMazes(userId);
+  return user.dislikedMazes;
 }
 
 export async function addDislikedMazeAndUpdateMazeDislikesNumber(
