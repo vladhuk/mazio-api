@@ -15,6 +15,7 @@ import UserNotFoundError from '../../../src/errors/UserNotFoundError';
 import { Types } from 'mongoose';
 import Maze, { IMaze } from '../../../src/models/Maze';
 import MazeNotFoundError from '../../../src/errors/MazeNotFoundError';
+import { getMazeById } from '../../../src/services/MazeService';
 
 const testUser1 = { username: 'testusername1', password: 'testpassword1' };
 const testUser2 = { username: 'testusername2', password: 'testpassword2' };
@@ -183,18 +184,18 @@ it('addLikedMazeAndUpdateMazeLikesNumber(). When: user does not exist. Expected:
 
   const id = Types.ObjectId();
 
-  expect(
-    await addLikedMazeAndUpdateMazeLikesNumber(id, testMazeModel._id)
-  ).toEqual(new UserNotFoundError(id));
+  return expect(
+    addLikedMazeAndUpdateMazeLikesNumber(id, testMazeModel._id)
+  ).rejects.toEqual(new UserNotFoundError(id));
 });
 
 it('addLikedMazeAndUpdateMazeLikesNumber(). When: maze does not exist. Expected: MazeNotFoundError', async () => {
   await testUserModel.save();
   const id = Types.ObjectId();
 
-  expect(
-    await addLikedMazeAndUpdateMazeLikesNumber(testUserModel._id, id)
-  ).toEqual(new MazeNotFoundError(id));
+  return expect(
+    addLikedMazeAndUpdateMazeLikesNumber(testUserModel._id, id)
+  ).rejects.toEqual(new MazeNotFoundError(id));
 });
 
 it('removeLikedMazeAndUpdateMazeLikesNumber(). When: maze is liked. Expected: no liked mazes and 0 likes in maze', async () => {
@@ -208,9 +209,10 @@ it('removeLikedMazeAndUpdateMazeLikesNumber(). When: maze is liked. Expected: no
     testUserModel._id,
     testMazeModel._id
   );
+  const likedMaze = await getMazeById(testMazeModel._id);
 
   expect(likedMazes.length).toBe(0);
-  expect(likedMazes[0].likes).toBe(0);
+  expect(likedMaze.likes).toBe(0);
 });
 
 it('removeLikedMazeAndUpdateMazeLikesNumber(). When: maze is not liked. Expected: no liked mazes and 0 likes in maze', async () => {
@@ -220,9 +222,10 @@ it('removeLikedMazeAndUpdateMazeLikesNumber(). When: maze is not liked. Expected
     testUserModel._id,
     testMazeModel._id
   );
+  const likedMaze = await getMazeById(testMazeModel._id);
 
   expect(likedMazes.length).toBe(0);
-  expect(likedMazes[0].likes).toBe(0);
+  expect(likedMaze.likes).toBe(0);
 });
 
 it('addDislikedMazeAndUpdateMazeDislikesNumber(). When: maze is not disliked. Expected: new disliked maze and increase number of dislikes', async () => {
@@ -248,7 +251,8 @@ it('removeDislikedMazeAndUpdateMazeDislikesNumber(). When: maze is disliked. Exp
     testUserModel._id,
     testMazeModel._id
   );
+  const dislikedMaze = await getMazeById(testMazeModel._id);
 
   expect(dislikedMazes.length).toBe(0);
-  expect(dislikedMazes[0].dislikes).toBe(0);
+  expect(dislikedMaze.dislikes).toBe(0);
 });
