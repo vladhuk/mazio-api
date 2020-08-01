@@ -6,9 +6,11 @@ import {
   Types,
   Model,
 } from 'mongoose';
-import { IMaze } from './Maze';
+import { defaultPopulateOptions as mazePopulateOptions, IMaze } from './Maze';
 import { genSaltSync, hashSync, compareSync } from 'bcrypt';
 import { generateJwtForUser } from '../utils/jwt';
+import QueryOptions from '../../@types/QueryOptions';
+import UserNotFoundError from '../errors/UserNotFoundError';
 
 interface IUserBase {
   username: string;
@@ -26,7 +28,6 @@ export interface IUser extends IUserBase, Document {
 
   validatePassword(password: string): boolean;
   generateJwt(): string;
-  toDto(): IUserDto;
 }
 
 export interface IUserDto extends IUserBase {
@@ -35,6 +36,21 @@ export interface IUserDto extends IUserBase {
 
 interface IUserModel extends Model<IUser> {
   toDto(user: IUser): IUserDto;
+
+  getByIdWithFriends(id: Types.ObjectId, opts?: QueryOptions): Promise<IUser>;
+  getByIdWithIgnoredUsers(
+    id: Types.ObjectId,
+    opts?: QueryOptions
+  ): Promise<IUser>;
+  getByIdWithLikedMazes(
+    id: Types.ObjectId,
+    opts?: QueryOptions
+  ): Promise<IUser>;
+  getByIdWithDislikedMazes(
+    id: Types.ObjectId,
+    opts?: QueryOptions
+  ): Promise<IUser>;
+  getByUsername(username: string, opts?: QueryOptions): Promise<IUser>;
 }
 
 const userSchema = new Schema(
@@ -61,21 +77,6 @@ userSchema.methods.generateJwt = function (): string {
   return generateJwtForUser(this._id);
 };
 
-function convertToDto(user: IUser): IUserDto {
-  return {
-    id: user._id,
-    username: user.username,
-  };
-}
-
-userSchema.methods.toDto = function (this: IUser): IUserDto {
-  return convertToDto(this);
-};
-
-userSchema.statics.toDto = function (user: IUser): IUserDto {
-  return convertToDto(user);
-};
-
 userSchema.pre<IUser>('save', function (next: HookNextFunction) {
   if (this.isModified('password')) {
     this.salt = genSaltSync(10);
@@ -83,5 +84,101 @@ userSchema.pre<IUser>('save', function (next: HookNextFunction) {
   }
   next();
 });
+
+userSchema.statics.toDto = function (user: IUser): IUserDto {
+  return {
+    id: user._id,
+    username: user.username,
+  };
+};
+
+function getOrThrowError(id: Types.ObjectId, user: IUser | null): IUser {
+  if (!user) {
+    throw new UserNotFoundError(id);
+  }
+
+  return user;
+}
+
+userSchema.statics.getByIdWithFriends = async function (
+  this: Model<IUser>,
+  id: Types.ObjectId,
+  { populate = true, lean = true } = {}
+): Promise<IUser> {
+  const query = this.findById(id).select({ friends: true });
+
+  populate && query.populate({ path: 'friends', select: { username: true } });
+  lean && query.lean();
+
+  const user = await query.exec();
+
+  return getOrThrowError(id, user);
+};
+
+userSchema.statics.getByIdWithIgnoredUsers = async function (
+  this: Model<IUser>,
+  id: Types.ObjectId,
+  { populate = true, lean = true } = {}
+): Promise<IUser> {
+  const query = this.findById(id).select({ ignoredUsers: true });
+
+  populate &&
+    query.populate({ path: 'ignoredUsers', select: { username: true } });
+  lean && query.lean();
+
+  const user = await query.exec();
+
+  return getOrThrowError(id, user);
+};
+
+userSchema.statics.getByIdWithLikedMazes = async function (
+  this: Model<IUser>,
+  id: Types.ObjectId,
+  { populate = true, lean = true } = {}
+): Promise<IUser> {
+  const query = this.findById(id).select({ likedMazes: true });
+
+  populate &&
+    query.populate({ path: 'likedMazes', populate: mazePopulateOptions });
+  lean && query.lean();
+
+  const user = await query.exec();
+
+  return getOrThrowError(id, user);
+};
+
+userSchema.statics.getByIdWithDislikedMazes = async function (
+  this: Model<IUser>,
+  id: Types.ObjectId,
+  { populate = true, lean = true } = {}
+): Promise<IUser> {
+  const query = this.findById(id).select({ dislikedMazes: true });
+
+  populate &&
+    query.populate({ path: 'dislikedMazes', populate: mazePopulateOptions });
+  lean && query.lean();
+
+  const user = await query.exec();
+
+  return getOrThrowError(id, user);
+};
+
+userSchema.statics.getByUsername = async function (
+  this: Model<IUser>,
+  username: string,
+  { lean = true } = {}
+): Promise<IUser> {
+  const query = this.findOne({ username }).select({ username: true });
+
+  lean && query.lean();
+
+  const user = await query.exec();
+
+  if (!user) {
+    throw new UserNotFoundError(undefined, username);
+  }
+
+  return user;
+};
 
 export default model<IUser, IUserModel>('User', userSchema);
