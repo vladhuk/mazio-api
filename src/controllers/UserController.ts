@@ -1,22 +1,11 @@
-import { RequestHandler, Response } from 'express';
+import { RequestHandler } from 'express';
 import * as userService from '../services/UserService';
 import { Types } from 'mongoose';
-import HttpStatus from 'http-status-codes';
-import UserNotFoundError from '../errors/UserNotFoundError';
-import logger from '../utils/logger';
 import User from '../models/User';
 import Maze from '../models/Maze';
+import { getDefaultErrorHandler } from '../utils/errorHandlers';
 
-const log = logger.child({ service: 'UserController' });
-
-function defaultErrorHandler(err: Error, res: Response) {
-  log.error(err);
-
-  if (err instanceof UserNotFoundError) {
-    return res.status(HttpStatus.NOT_FOUND).send(err.message);
-  }
-  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
-}
+const defaultErrorHandler = getDefaultErrorHandler('UserController');
 
 export const getFriends: RequestHandler = (req, res) => {
   userService
