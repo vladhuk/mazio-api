@@ -1,11 +1,13 @@
 import Maze, { Type } from '../../../src/models/Maze';
 import User, { IUser } from '../../../src/models/User';
 import {
-  getMazesByOwnerAndType,
+  getMazesByOwnerIdAndType,
   createMaze,
   incrementLikes,
   incrementDislikes,
+  publishMaze,
 } from '../../../src/services/MazeService';
+import BadRequestError from '../../../src/errors/http/BadRequestError';
 
 let testUserModel: IUser;
 
@@ -35,13 +37,13 @@ beforeEach(() => {
   testMazeSnippet.owner = testUserModel._id;
 });
 
-it('getMazesByOwnerAndType(). When: type is published mazes. Expected: only published mazes', async () => {
+it('getMazesByOwnerIdAndType(). When: type is published mazes. Expected: only published mazes', async () => {
   await testUserModel.save();
   const publishedMaze = new Maze({ ...testMazeSnippet, type: Type.PUBLISHED });
   const draftMaze = new Maze({ ...testMazeSnippet, title: 'draftMaze' });
   await Maze.create(publishedMaze, draftMaze);
 
-  const publishedMazes = await getMazesByOwnerAndType(
+  const publishedMazes = await getMazesByOwnerIdAndType(
     testUserModel._id,
     Type.PUBLISHED
   );
@@ -57,6 +59,23 @@ it('createMaze(). When: owner exists. Expected: correct creating', async () => {
 
   expect(maze._id).toBeDefined();
   expect((<IUser>maze.owner)._id).toEqual(testUserModel._id);
+});
+
+it('publishMaze(). When: maze is draft. Expected: new published maze will created.', async () => {
+  const maze = await new Maze(testMazeSnippet).save();
+
+  const publishedMaze = await publishMaze(maze._id);
+
+  expect(publishedMaze._id).not.toEqual(maze._id);
+  expect(publishedMaze.type).toBe(Type.PUBLISHED);
+  expect((await Maze.find()).length).toBe(2);
+});
+
+it('publishMaze(). When: maze is not a draft. Expected: new published maze will created.', async () => {
+  const maze = new Maze({ ...testMazeSnippet, type: Type.PUBLISHED });
+  await maze.save();
+
+  return expect(publishMaze(maze._id)).rejects.toBeInstanceOf(BadRequestError);
 });
 
 it('incrementLikes(). When: maze exist. Expected: correct increment', async () => {
