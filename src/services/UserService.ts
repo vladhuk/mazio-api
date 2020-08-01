@@ -1,278 +1,203 @@
 import User, { IUser } from '../models/User';
-import UserNotFoundError from '../errors/UserNotFoundError';
 import { Types } from 'mongoose';
-import logger from '../utils/logger';
 import * as mazeService from './MazeService';
-import {
-  defaultPopulateOptions as mazePopulateOptions,
-  IMaze,
-} from '../models/Maze';
-
-const log = logger.child({ servise: 'UserService' });
+import { IMaze } from '../models/Maze';
+import BadRequestError from '../errors/http/BadRequestError';
 
 export async function getFriends(userId: Types.ObjectId): Promise<IUser[]> {
-  const user = await User.findById(userId)
-    .select({
-      _id: false,
-      friends: true,
-    })
-    .populate({ path: 'friends', select: { username: true } })
-    .lean();
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
-
+  const user = await User.getByIdWithFriends(userId);
   return user.friends;
 }
 
 export async function addFriend(
   userId: Types.ObjectId,
   friendUsername: string
-): Promise<IUser[]> {
-  const user = await User.findById(userId)
-    .select({
-      friends: true,
-    })
-    .populate({ path: 'friends', select: { username: true } });
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
+): Promise<IUser> {
+  const user = await User.getByIdWithFriends(userId, { lean: false });
 
   const friendExists = user.friends
     .map((friend) => friend.username)
     .includes(friendUsername);
 
   if (friendExists) {
-    log.warn(
+    throw new BadRequestError(
       `User with username '${friendUsername}' is already friend of user with id ${userId}.`
     );
-  } else {
-    const newFriend = await User.findOne({ username: friendUsername }).select({
-      username: true,
-    });
-
-    if (!newFriend) {
-      throw new UserNotFoundError(undefined, friendUsername);
-    }
-
-    user.friends.push(newFriend);
-    await user.save();
   }
 
-  return user.friends;
+  const newFriend = await User.getByUsername(friendUsername);
+  user.friends.push(newFriend);
+  await user.save();
+
+  return newFriend;
 }
 
 export async function deleteFriend(
   userId: Types.ObjectId,
   friendId: Types.ObjectId
 ): Promise<void> {
-  return User.updateOne({ _id: userId }, { $pull: { friends: friendId } });
+  const user = await User.getByIdWithFriends(userId, {
+    populate: false,
+    lean: false,
+  });
+  user.friends.pull(friendId);
+  await user.save();
 }
 
 export async function getIgnoredUsers(
   userId: Types.ObjectId
 ): Promise<IUser[]> {
-  const user = await User.findById(userId)
-    .select({
-      _id: false,
-      ignoredUsers: true,
-    })
-    .populate({ path: 'ignoredUsers', select: { username: true } })
-    .lean();
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
-
+  const user = await User.getByIdWithIgnoredUsers(userId);
   return user.ignoredUsers;
 }
 
 export async function addIgnoredUser(
   userId: Types.ObjectId,
   ignoredUserUsername: string
-): Promise<IUser[]> {
-  const user = await User.findById(userId)
-    .select({
-      ignoredUsers: true,
-    })
-    .populate({ path: 'ignoredUsers', select: { username: true } });
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
+): Promise<IUser> {
+  const user = await User.getByIdWithIgnoredUsers(userId, { lean: false });
 
   const ignoredUserExists = user.ignoredUsers
     .map((ignoredUser) => ignoredUser.username)
     .includes(ignoredUserUsername);
 
   if (ignoredUserExists) {
-    log.warn(
+    throw new BadRequestError(
       `User with username '${ignoredUserUsername}' is already ignored by user with id ${userId}.`
     );
-  } else {
-    const newIgnoredUser = await User.findOne({
-      username: ignoredUserUsername,
-    }).select({
-      username: true,
-    });
-
-    if (!newIgnoredUser) {
-      throw new UserNotFoundError(undefined, ignoredUserUsername);
-    }
-
-    user.ignoredUsers.push(newIgnoredUser);
-    await user.save();
   }
 
-  return user.ignoredUsers;
+  const newIgnoredUser = await User.getByUsername(ignoredUserUsername);
+  user.ignoredUsers.push(newIgnoredUser);
+  await user.save();
+
+  return newIgnoredUser;
 }
 
 export async function deleteIgnoredUser(
   userId: Types.ObjectId,
   ignoredUserId: Types.ObjectId
 ): Promise<void> {
-  return User.updateOne(
-    { _id: userId },
-    { $pull: { ignoredUsers: ignoredUserId } }
-  );
-}
-
-async function getUserWithLikedMazes(userId: Types.ObjectId): Promise<IUser> {
-  const user = await User.findById(userId)
-    .select({ likedMazes: true })
-    .populate({
-      path: 'likedMazes',
-      populate: mazePopulateOptions,
-    });
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
-
-  return user;
-}
-
-async function getUserWithDislikedMazes(
-  userId: Types.ObjectId
-): Promise<IUser> {
-  const user = await User.findById(userId)
-    .select({ dislikedMazes: true })
-    .populate({
-      path: 'dislikedMazes',
-      populate: mazePopulateOptions,
-    });
-
-  if (!user) {
-    throw new UserNotFoundError(userId);
-  }
-
-  return user;
+  const user = await User.getByIdWithIgnoredUsers(userId, {
+    populate: false,
+    lean: false,
+  });
+  user.ignoredUsers.pull(ignoredUserId);
+  await user.save();
 }
 
 export async function getLikedMazes(userId: Types.ObjectId): Promise<IMaze[]> {
-  const user = await getUserWithLikedMazes(userId);
+  const user = await User.getByIdWithLikedMazes(userId);
   return user.likedMazes;
 }
 
 export async function addLikedMazeAndUpdateMazeLikesNumber(
   userId: Types.ObjectId,
   mazeId: Types.ObjectId
-): Promise<IMaze[]> {
-  const user = await getUserWithLikedMazes(userId);
+): Promise<IMaze> {
+  const user = await User.getByIdWithLikedMazes(userId, {
+    lean: false,
+    populate: false,
+  });
 
   const likedMazeExists = user.likedMazes
-    .map((likedMaze) => likedMaze._id)
+    .map((id) => id.toString())
     .includes(mazeId.toString());
 
   if (likedMazeExists) {
-    log.warn(`Maze ${mazeId} already liked by user ${userId}.`);
-    return user.likedMazes;
+    throw new BadRequestError(
+      `Maze ${mazeId} already liked by user ${userId}.`
+    );
   }
 
   await mazeService.incrementLikes(mazeId, 1);
 
   const likedMaze = await mazeService.getMazeById(mazeId);
-
-  user.likedMazes.push(likedMaze);
+  user.likedMazes.push(likedMaze._id);
   await user.save();
 
-  return user.likedMazes;
+  return likedMaze;
 }
 
 export async function removeLikedMazeAndUpdateMazeLikesNumber(
   userId: Types.ObjectId,
   mazeId: Types.ObjectId
-): Promise<IMaze[]> {
-  const user = await getUserWithLikedMazes(userId);
+): Promise<void> {
+  const user = await User.getByIdWithLikedMazes(userId, {
+    lean: false,
+    populate: false,
+  });
 
   const likedMazeExists = user.likedMazes
-    .map((likedMaze) => likedMaze._id)
+    .map((id) => id.toString())
     .includes(mazeId.toString());
 
   if (!likedMazeExists) {
-    log.warn(`Maze ${mazeId} was not be liked by user ${userId}.`);
-    return user.likedMazes;
+    throw new BadRequestError(
+      `Maze ${mazeId} was not be liked by user ${userId}.`
+    );
   }
 
   await mazeService.incrementLikes(mazeId, -1);
   user.likedMazes.pull(mazeId);
   await user.save();
-
-  return user.likedMazes;
 }
 
 export async function getDislikedMazes(
   userId: Types.ObjectId
 ): Promise<IMaze[]> {
-  const user = await getUserWithDislikedMazes(userId);
+  const user = await User.getByIdWithDislikedMazes(userId);
   return user.dislikedMazes;
 }
 
 export async function addDislikedMazeAndUpdateMazeDislikesNumber(
   userId: Types.ObjectId,
   mazeId: Types.ObjectId
-): Promise<IMaze[]> {
-  const user = await getUserWithDislikedMazes(userId);
+): Promise<IMaze> {
+  const user = await User.getByIdWithDislikedMazes(userId, {
+    lean: false,
+    populate: false,
+  });
 
   const dislikedMazeExists = user.dislikedMazes
-    .map((dislikedMaze) => dislikedMaze._id)
+    .map((id) => id.toString())
     .includes(mazeId.toString());
 
   if (dislikedMazeExists) {
-    log.warn(`Maze ${mazeId} already disliked by user ${userId}.`);
-    return user.dislikedMazes;
+    throw new BadRequestError(
+      `Maze ${mazeId} already disliked by user ${userId}.`
+    );
   }
 
   await mazeService.incrementDislikes(mazeId, 1);
 
   const dislikedMaze = await mazeService.getMazeById(mazeId);
-
-  user.dislikedMazes.push(dislikedMaze);
+  user.dislikedMazes.push(dislikedMaze._id);
   await user.save();
 
-  return user.dislikedMazes;
+  return dislikedMaze;
 }
 
 export async function removeDislikedMazeAndUpdateMazeDislikesNumber(
   userId: Types.ObjectId,
   mazeId: Types.ObjectId
-): Promise<IMaze[]> {
-  const user = await getUserWithDislikedMazes(userId);
+): Promise<void> {
+  const user = await User.getByIdWithDislikedMazes(userId, {
+    lean: false,
+    populate: false,
+  });
 
   const dislikedMazeExists = user.dislikedMazes
-    .map((dislikedMaze) => dislikedMaze._id)
+    .map((id) => id.toString())
     .includes(mazeId.toString());
 
   if (!dislikedMazeExists) {
-    log.warn(`Maze ${mazeId} was not be disliked by user ${userId}.`);
-    return user.dislikedMazes;
+    throw new BadRequestError(
+      `Maze ${mazeId} was not be disliked by user ${userId}.`
+    );
   }
 
   await mazeService.incrementDislikes(mazeId, -1);
   user.dislikedMazes.pull(mazeId);
   await user.save();
-
-  return user.dislikedMazes;
 }

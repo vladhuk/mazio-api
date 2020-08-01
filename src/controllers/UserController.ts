@@ -11,15 +11,15 @@ export const getFriends: RequestHandler = (req, res) => {
   userService
     .getFriends(Types.ObjectId(req.params.id))
     .then((users) => users.map(User.toDto))
-    .then((friends) => res.json(friends))
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
 export const addFriend: RequestHandler = (req, res) => {
   userService
     .addFriend(Types.ObjectId(req.params.id), req.body.username)
-    .then((users) => users.map(User.toDto))
-    .then((friends) => res.json(friends))
+    .then(User.toDto)
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -37,15 +37,15 @@ export const getIgnoredUsers: RequestHandler = (req, res) => {
   userService
     .getIgnoredUsers(Types.ObjectId(req.params.id))
     .then((users) => users.map(User.toDto))
-    .then((ignoredUsers) => res.json(ignoredUsers))
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
 export const addIgnoredUser: RequestHandler = (req, res) => {
   userService
     .addIgnoredUser(Types.ObjectId(req.params.id), req.body.username)
-    .then((users) => users.map(User.toDto))
-    .then((ignoredUsers) => res.json(ignoredUsers))
+    .then(User.toDto)
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -63,7 +63,7 @@ export const getLikedMazes: RequestHandler = (req, res) => {
   userService
     .getLikedMazes(Types.ObjectId(req.params.id))
     .then((mazes) => mazes.map(Maze.toDto))
-    .then((mazes) => res.json(mazes))
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -73,7 +73,8 @@ export const addLikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.body.id)
     )
-    .then(() => res.end())
+    .then(Maze.toDto)
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -91,7 +92,7 @@ export const getDislikedMazes: RequestHandler = (req, res) => {
   userService
     .getDislikedMazes(Types.ObjectId(req.params.id))
     .then((mazes) => mazes.map(Maze.toDto))
-    .then((mazes) => res.json(mazes))
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
@@ -101,7 +102,8 @@ export const addDislikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.id),
       Types.ObjectId(req.body.id)
     )
-    .then(() => res.end())
+    .then(Maze.toDto)
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
 
