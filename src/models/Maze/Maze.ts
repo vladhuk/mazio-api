@@ -11,6 +11,8 @@ import InfoSchema, { IInfo } from './subdocs/InfoSchema';
 import StructureSchema, { IStructure } from './subdocs/StructureSchema';
 import User, { IUser, IUserDto } from '../User';
 import FieldsNotPopulatedError from '../../errors/FieldsNotPopulatedError';
+import MazeNotFoundError from '../../errors/MazeNotFoundError';
+import QueryOptions from '../../../@types/QueryOptions';
 
 interface IMazeBase {
   title: string;
@@ -26,8 +28,6 @@ interface IMazeBase {
 
 export interface IMaze extends IMazeBase, Document {
   owner: IUser | Types.ObjectId;
-
-  toDto(): IMazeDto;
 }
 
 export interface IMazeDto extends IMazeBase {
@@ -37,6 +37,13 @@ export interface IMazeDto extends IMazeBase {
 
 interface IMazeModel extends Model<IMaze> {
   toDto(user: IMaze): IMazeDto;
+
+  getById(id: Types.ObjectId, opts?: QueryOptions): Promise<IMaze>;
+  getByOwnerIdAndType(
+    ownerId: Types.ObjectId,
+    type: Type,
+    opts?: QueryOptions
+  ): Promise<IMaze[]>;
 }
 
 export enum Type {
@@ -60,7 +67,7 @@ const mazeSchema = new Schema(
   }
 );
 
-function convertToDto(maze: IMaze): IMazeDto {
+mazeSchema.statics.toDto = function (maze: IMaze): IMazeDto {
   if (maze.owner instanceof Types.ObjectId) {
     throw new FieldsNotPopulatedError('owner');
   }
@@ -78,19 +85,40 @@ function convertToDto(maze: IMaze): IMazeDto {
     createdAt: maze.createdAt,
     updatedAt: maze.updatedAt,
   };
-}
-
-mazeSchema.methods.toDto = function (this: IMaze): IMazeDto {
-  return convertToDto(this);
-};
-
-mazeSchema.statics.toDto = function (maze: IMaze): IMazeDto {
-  return convertToDto(maze);
 };
 
 export const defaultPopulateOptions: QueryPopulateOptions = {
   path: 'owner',
   select: { username: true },
+};
+
+mazeSchema.statics.getById = async function (
+  this: Model<IMaze>,
+  id: Types.ObjectId,
+  { lean = true }: QueryOptions = {}
+): Promise<IMaze> {
+  const query = this.findById(id).populate(defaultPopulateOptions);
+  lean && query.lean();
+  const maze = await query.exec();
+
+  if (!maze) {
+    throw new MazeNotFoundError(id);
+  }
+
+  return maze;
+};
+
+mazeSchema.statics.getByOwnerIdAndType = async function (
+  this: Model<IMaze>,
+  ownerId: Types.ObjectId,
+  type: Type,
+  { lean = true }: QueryOptions = {}
+): Promise<IMaze[]> {
+  const query = this.find({ owner: ownerId, type: type }).populate(
+    defaultPopulateOptions
+  );
+  lean && query.lean();
+  return query.exec();
 };
 
 export default model<IMaze, IMazeModel>('Maze', mazeSchema);
