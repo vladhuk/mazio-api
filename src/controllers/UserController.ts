@@ -5,6 +5,7 @@ import HttpStatus from 'http-status-codes';
 import UserNotFoundError from '../errors/UserNotFoundError';
 import logger from '../utils/logger';
 import User from '../models/User';
+import Maze from '../models/Maze';
 
 const log = logger.child({ service: 'UserController' });
 
@@ -69,6 +70,14 @@ export const deleteIgnoredUser: RequestHandler = (req, res) => {
     .catch((err) => defaultErrorHandler(err, res));
 };
 
+export const getLikedMazes: RequestHandler = (req, res) => {
+  userService
+    .getLikedMazes(Types.ObjectId(req.params.id))
+    .then((mazes) => mazes.map(Maze.toDto))
+    .then((mazes) => res.json(mazes))
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
 export const addLikedMaze: RequestHandler = (req, res) => {
   userService
     .addLikedMazeAndUpdateMazeLikesNumber(
@@ -86,6 +95,14 @@ export const removeLikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.mazeId)
     )
     .then(() => res.end())
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const getDislikedMazes: RequestHandler = (req, res) => {
+  userService
+    .getDislikedMazes(Types.ObjectId(req.params.id))
+    .then((mazes) => mazes.map(Maze.toDto))
+    .then((mazes) => res.json(mazes))
     .catch((err) => defaultErrorHandler(err, res));
 };
 
