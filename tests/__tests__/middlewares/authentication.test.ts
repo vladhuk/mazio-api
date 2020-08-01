@@ -7,7 +7,7 @@ import { IJwtPayload } from '../../../src/utils/jwt';
 
 const testUser = { username: 'someusername', password: 'somepassword' };
 
-it('authRequired(). When: jwt is valid. Expect: user field in request', async () => {
+it('authRequired(). When: jwt is valid. Expected: user field in request', async () => {
   const user = new User(testUser);
   await user.save();
 

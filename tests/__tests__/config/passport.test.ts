@@ -12,13 +12,13 @@ app.post('/', authenticate('local', { session: false }), (req, res) =>
   res.end()
 );
 
-it('authenticate(). When: user exists in db. Expect: 200', async () => {
+it('authenticate(). When: user exists in db. Expected: 200', async () => {
   const user = new User(testUser);
   await user.save();
 
   return request(app).post('/').send(testUser).expect(200);
 });
 
-it('authenticate(). When: user does not exist. Expect: 401', () => {
+it('authenticate(). When: user does not exist. Expected: 401', () => {
   return request(app).post('/').send(testUser).expect(401);
 });

@@ -51,7 +51,7 @@ it('getMazesByOwnerAndType(). When: type is published mazes. Expected: only publ
   expect((<IUser>publishedMaze.owner)._id).toEqual(testUserModel._id);
 });
 
-it('createMaze(). When: owner exists. Expect: correct creating', async () => {
+it('createMaze(). When: owner exists. Expected: correct creating', async () => {
   await testUserModel.save();
   const maze = await createMaze(new Maze(testMazeSnippet), testUserModel._id);
 
@@ -59,7 +59,7 @@ it('createMaze(). When: owner exists. Expect: correct creating', async () => {
   expect((<IUser>maze.owner)._id).toEqual(testUserModel._id);
 });
 
-it('incrementLikes(). When: maze exist. Expect: correct increment', async () => {
+it('incrementLikes(). When: maze exist. Expected: correct increment', async () => {
   const maze = await new Maze(testMazeSnippet).save();
   const expectedLikes = maze.likes + 1;
   const incrementedLikes = await incrementLikes(maze._id, 1);
@@ -71,7 +71,7 @@ it('incrementLikes(). When: maze exist. Expect: correct increment', async () => 
   expect(updatedMaze?.likes).toBe(expectedLikes);
 });
 
-it('incrementDislikes(). When: maze exist. Expect: correct increment', async () => {
+it('incrementDislikes(). When: maze exist. Expected: correct increment', async () => {
   const maze = await new Maze(testMazeSnippet).save();
   const expectedDislikes = maze.dislikes + 1;
   const incrementedDisikes = await incrementDislikes(maze._id, 1);

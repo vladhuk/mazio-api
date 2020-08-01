@@ -48,7 +48,7 @@ beforeEach(() => {
   testMazeModel = new Maze({ ...testMazeSnippet, owner: testUserModel });
 });
 
-it('getFriends(). When: user and friend exist. Expect: list with friend', async () => {
+it('getFriends(). When: user and friend exist. Expected: list with friend', async () => {
   const friendUser = new User(testUser2);
   await friendUser.save();
   const user = new User({ ...testUser1, friends: [friendUser] });
@@ -61,12 +61,12 @@ it('getFriends(). When: user and friend exist. Expect: list with friend', async 
   expect(friends[0]._id).toEqual(friendUser._id);
 });
 
-it('getFriends(). When: user does not exist. Expect: UserNotFoundError', () => {
+it('getFriends(). When: user does not exist. Expected: UserNotFoundError', () => {
   const id = Types.ObjectId();
   return expect(getFriends(id)).rejects.toEqual(new UserNotFoundError(id));
 });
 
-it('addFriend(). When: user exists and does not have this friend. Expect: add friend', async () => {
+it('addFriend(). When: user exists and does not have this friend. Expected: add friend', async () => {
   const friendUser = new User(testUser2);
   await friendUser.save();
   const user = new User(testUser1);
@@ -79,7 +79,7 @@ it('addFriend(). When: user exists and does not have this friend. Expect: add fr
   expect(friends[0]._id).toEqual(friendUser._id);
 });
 
-it('addFriend(). When: friend does not exist. Expect: UserNotFoundError', async () => {
+it('addFriend(). When: friend does not exist. Expected: UserNotFoundError', async () => {
   const user = new User(testUser1);
   await user.save();
 
@@ -88,7 +88,7 @@ it('addFriend(). When: friend does not exist. Expect: UserNotFoundError', async 
   );
 });
 
-it('addFriend(). When: friend already added. Expect: one friend', async () => {
+it('addFriend(). When: friend already added. Expected: one friend', async () => {
   const friendUser = new User(testUser2);
   await friendUser.save();
   const user = new User({ ...testUser1, friends: [friendUser] });
@@ -112,7 +112,7 @@ it('deleteFriend(). When: friend exists. Expected: deleted friend', async () => 
   expect(friends.length).toBe(0);
 });
 
-it('getIgnoredUsers(). When: user and and inored user exist. Expect: list with ignores users', async () => {
+it('getIgnoredUsers(). When: user and and inored user exist. Expected: list with ignores users', async () => {
   const ignoredUser = new User(testUser2);
   await ignoredUser.save();
   const user = new User({ ...testUser1, ignoredUsers: [ignoredUser] });
@@ -125,7 +125,7 @@ it('getIgnoredUsers(). When: user and and inored user exist. Expect: list with i
   expect(ignoredUsers[0]._id).toEqual(ignoredUser._id);
 });
 
-it('addIgnoredUser(). When: user exists and does not have this ignored user. Expect: add ignored user', async () => {
+it('addIgnoredUser(). When: user exists and does not have this ignored user. Expected: add ignored user', async () => {
   const ignoredUser = new User(testUser2);
   await ignoredUser.save();
   const user = new User(testUser1);
