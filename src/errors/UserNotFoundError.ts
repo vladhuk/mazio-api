@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
+import NotFoundError from './http/NotFoundError';
 
-export default class UserNotFoundError extends Error {
+export default class UserNotFoundError extends NotFoundError {
   constructor(userId?: Types.ObjectId, username?: string) {
     if (userId) {
       super(`User with id ${userId} is not found.`);
