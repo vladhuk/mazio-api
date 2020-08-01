@@ -34,7 +34,7 @@ beforeEach(() => {
     username: 'testusername',
     password: 'testpassword',
   });
-  testMazeSnippet.owner = testUserModel._id;
+  testMazeSnippet.owner = testUserModel;
 });
 
 it('getMazesByOwnerIdAndType(). When: type is published mazes. Expected: only published mazes', async () => {
@@ -62,6 +62,7 @@ it('createMaze(). When: owner exists. Expected: correct creating', async () => {
 });
 
 it('publishMaze(). When: maze is draft. Expected: new published maze will created.', async () => {
+  await testUserModel.save();
   const maze = await new Maze(testMazeSnippet).save();
 
   const publishedMaze = await publishMaze(maze._id);
