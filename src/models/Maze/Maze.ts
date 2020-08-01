@@ -95,10 +95,13 @@ export const defaultPopulateOptions: QueryPopulateOptions = {
 mazeSchema.statics.getById = async function (
   this: Model<IMaze>,
   id: Types.ObjectId,
-  { lean = true }: QueryOptions = {}
+  { populate = true, lean = true } = {}
 ): Promise<IMaze> {
-  const query = this.findById(id).populate(defaultPopulateOptions);
+  const query = this.findById(id);
+
+  populate && query.populate(defaultPopulateOptions);
   lean && query.lean();
+
   const maze = await query.exec();
 
   if (!maze) {
@@ -112,12 +115,13 @@ mazeSchema.statics.getByOwnerIdAndType = async function (
   this: Model<IMaze>,
   ownerId: Types.ObjectId,
   type: Type,
-  { lean = true }: QueryOptions = {}
+  { populate = true, lean = true } = {}
 ): Promise<IMaze[]> {
-  const query = this.find({ owner: ownerId, type: type }).populate(
-    defaultPopulateOptions
-  );
+  const query = this.find({ owner: ownerId, type: type });
+
+  populate && query.populate(defaultPopulateOptions);
   lean && query.lean();
+
   return query.exec();
 };
 
