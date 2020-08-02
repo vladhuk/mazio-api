@@ -10,17 +10,35 @@ export async function getMazeById(id: Types.ObjectId): Promise<IMaze> {
   return Maze.getById(id);
 }
 
+export async function getMazeByIdAndType(
+  id: Types.ObjectId,
+  type: MazeType
+): Promise<IMaze> {
+  return Maze.getByIdAndType(id, type);
+}
+
+export async function getMazeByIdAndOwnerId(
+  mazeId: Types.ObjectId,
+  ownerId: Types.ObjectId
+): Promise<IMaze> {
+  return Maze.getByIdAndOwnerId(mazeId, ownerId);
+}
+
 export async function getMazesByOwnerIdAndType(
   ownerId: Types.ObjectId,
   mazeType: MazeType
 ): Promise<IMaze[]> {
-  const isUserExist = await User.exists({ _id: ownerId });
-
-  if (!isUserExist) {
-    throw new UserNotFoundError(ownerId);
-  }
-
   return Maze.getByOwnerIdAndType(ownerId, mazeType);
+}
+
+export async function getMazesByOwnerId(
+  ownerId: Types.ObjectId
+): Promise<IMaze[]> {
+  return Maze.getByOwnerId(ownerId);
+}
+
+export async function getMazesByType(mazeType: MazeType): Promise<IMaze[]> {
+  return getMazesByType(mazeType);
 }
 
 export async function createMaze(
@@ -46,9 +64,12 @@ export async function createMaze(
 
 export async function updateMaze(
   mazeId: Types.ObjectId,
-  maze: IMaze
+  maze: IMaze,
+  ownerId: Types.ObjectId
 ): Promise<IMaze> {
-  const currentMaze = await Maze.getById(mazeId, { lean: false });
+  const currentMaze = await Maze.getByIdAndOwnerId(mazeId, ownerId, {
+    lean: false,
+  });
 
   if (currentMaze.type !== Type.DRAFT) {
     throw new BadRequestError(`Maze ${mazeId} is not a draft.`);
@@ -67,15 +88,21 @@ export async function updateMaze(
   return currentMaze.save();
 }
 
-export async function deleteMaze(id: Types.ObjectId): Promise<void> {
-  await Maze.deleteOne({ _id: id });
+export async function deleteMaze(
+  mazeId: Types.ObjectId,
+  ownerId: Types.ObjectId
+): Promise<void> {
+  await Maze.deleteOne({ _id: mazeId, owner: ownerId });
 }
 
-export async function publishMaze(id: Types.ObjectId): Promise<IMaze> {
-  const draftMaze = await Maze.getById(id);
+export async function publishMaze(
+  mazeId: Types.ObjectId,
+  ownerId: Types.ObjectId
+): Promise<IMaze> {
+  const draftMaze = await Maze.getByIdAndOwnerId(mazeId, ownerId);
 
   if (draftMaze.type !== Type.DRAFT) {
-    throw new BadRequestError(`Maze ${id} is not a draft.`);
+    throw new BadRequestError(`Maze ${mazeId} is not a draft.`);
   }
 
   delete draftMaze._id;
