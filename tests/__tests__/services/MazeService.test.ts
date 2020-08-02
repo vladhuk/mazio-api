@@ -65,7 +65,7 @@ it('publishMaze(). When: maze is draft. Expected: new published maze will create
   await testUserModel.save();
   const maze = await new Maze(testMazeSnippet).save();
 
-  const publishedMaze = await publishMaze(maze._id);
+  const publishedMaze = await publishMaze(maze._id, testUserModel._id);
 
   expect(publishedMaze._id).not.toEqual(maze._id);
   expect(publishedMaze.type).toBe(Type.PUBLISHED);
@@ -76,7 +76,9 @@ it('publishMaze(). When: maze is not a draft. Expected: new published maze will 
   const maze = new Maze({ ...testMazeSnippet, type: Type.PUBLISHED });
   await maze.save();
 
-  return expect(publishMaze(maze._id)).rejects.toBeInstanceOf(BadRequestError);
+  return expect(
+    publishMaze(maze._id, testUserModel._id)
+  ).rejects.toBeInstanceOf(BadRequestError);
 });
 
 it('incrementLikes(). When: maze exist. Expected: correct increment', async () => {
