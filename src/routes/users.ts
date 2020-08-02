@@ -13,5 +13,11 @@ router.post('/:id/liked-mazes', userController.addLikedMaze);
 router.delete('/:id/liked-mazes/:mazeId', userController.removeLikedMaze);
 router.post('/:id/disiked-mazes', userController.addDislikedMaze);
 router.delete('/:id/disliked-mazes/:mazeId', userController.removeDislikedMaze);
+router.get('/:id/mazes', userController.getMazes);
+router.get('/:id/mazes', userController.createMaze);
+router.delete('/:id/mazes/:mazesId', userController.getMaze);
+router.delete('/:id/mazes/:mazesId', userController.updateMaze);
+router.delete('/:id/mazes/:mazesId', userController.deleteMaze);
+router.delete('/:id/mazes/:mazesId', userController.publishMaze);
 
 export default router;
