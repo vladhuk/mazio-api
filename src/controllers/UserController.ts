@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import * as userService from '../services/UserService';
+import * as mazeService from '../services/MazeService';
 import { Types } from 'mongoose';
 import User from '../models/User';
 import Maze from '../models/Maze';
@@ -114,5 +115,68 @@ export const removeDislikedMaze: RequestHandler = (req, res) => {
       Types.ObjectId(req.params.mazeId)
     )
     .then(() => res.end())
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const getMazes: RequestHandler = (req, res) => {
+  const mazeType = req.query.type ? parseInt(<string>req.query.type) : null;
+  const userId = Types.ObjectId(req.params.id);
+
+  const promisedUsers = mazeType
+    ? mazeService.getMazesByOwnerIdAndType(userId, mazeType)
+    : mazeService.getMazesByOwnerId(userId);
+
+  promisedUsers
+    .then((mazes) => mazes.map(Maze.toDto))
+    .then(res.json)
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const getMaze: RequestHandler = (req, res) => {
+  mazeService
+    .getMazeByIdAndOwnerId(
+      Types.ObjectId(req.params.mazeId),
+      Types.ObjectId(req.params.id)
+    )
+    .then(Maze.toDto)
+    .then(res.json)
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const createMaze: RequestHandler = (req, res) => {
+  mazeService
+    .createMaze(req.body, Types.ObjectId(req.params.id))
+    .then(Maze.toDto)
+    .then(res.json)
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const updateMaze: RequestHandler = (req, res) => {
+  mazeService
+    .updateMaze(
+      Types.ObjectId(req.params.mazeId),
+      req.body,
+      Types.ObjectId(req.params.id)
+    )
+    .then(Maze.toDto)
+    .then(res.json)
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const deleteMaze: RequestHandler = (req, res) => {
+  mazeService
+    .deleteMaze(
+      Types.ObjectId(req.params.mazeId),
+      Types.ObjectId(req.params.id)
+    )
+    .then(() => res.end())
+    .catch((err) => defaultErrorHandler(err, res));
+};
+
+export const publishMaze: RequestHandler = (req, res) => {
+  mazeService
+    .publishMaze(req.body, Types.ObjectId(req.params.id))
+    .then(Maze.toDto)
+    .then(res.json)
     .catch((err) => defaultErrorHandler(err, res));
 };
