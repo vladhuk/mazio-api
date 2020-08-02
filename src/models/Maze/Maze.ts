@@ -5,6 +5,7 @@ import {
   Types,
   Model,
   QueryPopulateOptions,
+  DocumentQuery,
 } from 'mongoose';
 import { values } from '../../utils/enum';
 import InfoSchema, { IInfo } from './subdocs/InfoSchema';
@@ -13,6 +14,7 @@ import User, { IUser, IUserDto } from '../User';
 import FieldsNotPopulatedError from '../../errors/FieldsNotPopulatedError';
 import MazeNotFoundError from '../../errors/MazeNotFoundError';
 import QueryOptions from '../../../@types/QueryOptions';
+import NotFoundError from '../../errors/http/NotFoundError';
 
 interface IMazeBase {
   title: string;
@@ -35,15 +37,31 @@ export interface IMazeDto extends IMazeBase {
   owner: IUserDto;
 }
 
-interface IMazeModel extends Model<IMaze> {
+interface QueryHelpers {
+  handleDefault<T>(this: DocumentQuery<T, IMaze>, opts?: QueryOptions): T;
+}
+
+interface IMazeModel extends Model<IMaze, QueryHelpers> {
   toDto(user: IMaze): IMazeDto;
 
   getById(id: Types.ObjectId, opts?: QueryOptions): Promise<IMaze>;
+  getByIdAndType(
+    id: Types.ObjectId,
+    type: Type,
+    opts?: QueryOptions
+  ): Promise<IMaze>;
+  getByIdAndOwnerId(
+    id: Types.ObjectId,
+    ownerId: Types.ObjectId,
+    opts?: QueryOptions
+  ): Promise<IMaze>;
   getByOwnerIdAndType(
     ownerId: Types.ObjectId,
     type: Type,
     opts?: QueryOptions
   ): Promise<IMaze[]>;
+  getByOwnerId(ownerId: Types.ObjectId, opts?: QueryOptions): Promise<IMaze[]>;
+  getByType(type: Type, opts?: QueryOptions): Promise<IMaze[]>;
 }
 
 export enum Type {
@@ -92,17 +110,21 @@ export const defaultPopulateOptions: QueryPopulateOptions = {
   select: { username: true },
 };
 
-mazeSchema.statics.getById = async function (
-  this: Model<IMaze>,
-  id: Types.ObjectId,
+mazeSchema.query.handleDefault = async function <T>(
+  this: DocumentQuery<T, IMaze>,
   { populate = true, lean = true } = {}
+): Promise<T> {
+  populate && this.populate(defaultPopulateOptions);
+  lean && this.lean();
+  return this.exec();
+};
+
+mazeSchema.statics.getById = async function (
+  this: IMazeModel,
+  id: Types.ObjectId,
+  opts?: QueryOptions
 ): Promise<IMaze> {
-  const query = this.findById(id);
-
-  populate && query.populate(defaultPopulateOptions);
-  lean && query.lean();
-
-  const maze = await query.exec();
+  const maze = this.findById(id).handleDefault(opts);
 
   if (!maze) {
     throw new MazeNotFoundError(id);
@@ -111,18 +133,61 @@ mazeSchema.statics.getById = async function (
   return maze;
 };
 
+mazeSchema.statics.getByIdAndType = async function (
+  this: IMazeModel,
+  id: Types.ObjectId,
+  type: Type,
+  opts?: QueryOptions
+): Promise<IMaze> {
+  const maze = this.findOne({ _id: id, type }).handleDefault(opts);
+
+  if (!maze) {
+    throw new NotFoundError(`Maze with id ${id} and type ${type} not found.`);
+  }
+
+  return maze;
+};
+
+mazeSchema.statics.getByIdAndOwnerId = async function (
+  this: IMazeModel,
+  id: Types.ObjectId,
+  ownerId: Types.ObjectId,
+  opts?: QueryOptions
+): Promise<IMaze> {
+  const maze = this.findOne({ _id: id, owner: ownerId }).handleDefault(opts);
+
+  if (!maze) {
+    throw new NotFoundError(
+      `Maze with id ${id} and owner ${ownerId} not found.`
+    );
+  }
+
+  return maze;
+};
+
 mazeSchema.statics.getByOwnerIdAndType = async function (
-  this: Model<IMaze>,
+  this: IMazeModel,
   ownerId: Types.ObjectId,
   type: Type,
-  { populate = true, lean = true } = {}
+  opts?: QueryOptions
 ): Promise<IMaze[]> {
-  const query = this.find({ owner: ownerId, type: type });
+  return this.find({ owner: ownerId, type: type }).handleDefault(opts);
+};
 
-  populate && query.populate(defaultPopulateOptions);
-  lean && query.lean();
+mazeSchema.statics.getByOwnerId = async function (
+  this: IMazeModel,
+  ownerId: Types.ObjectId,
+  opts?: QueryOptions
+): Promise<IMaze[]> {
+  return this.find({ owner: ownerId }).handleDefault(opts);
+};
 
-  return query.exec();
+mazeSchema.statics.getByType = async function (
+  this: IMazeModel,
+  type: Type,
+  opts?: QueryOptions
+): Promise<IMaze[]> {
+  return this.find({ type: type }).handleDefault(opts);
 };
 
 export default model<IMaze, IMazeModel>('Maze', mazeSchema);
