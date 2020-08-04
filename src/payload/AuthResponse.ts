@@ -1,6 +1,6 @@
 import { IUserDto } from '../models/User';
 
-export default class JwtAuthResponse {
+export default class AuthResponse {
   private user: IUserDto;
   private token: string;
   private tokenType = 'Bearer';
