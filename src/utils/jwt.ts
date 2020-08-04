@@ -1,10 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-export interface IJwtPayload {
-  sub: string;
-  exp: number;
-  iat: number;
-}
+import JWT from '../../@types/JWT';
 
 export function generateJwtForUser(userId: string): string {
   const iat = new Date();
@@ -12,7 +7,7 @@ export function generateJwtForUser(userId: string): string {
   const exp = new Date(iat);
   exp.setSeconds(iat.getSeconds() + age);
 
-  const jwtPayload: IJwtPayload = {
+  const jwtPayload: JWT = {
     sub: userId,
     exp: exp.getTime() / 1000,
     iat: iat.getTime() / 1000,

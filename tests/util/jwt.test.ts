@@ -1,6 +1,7 @@
 import User from '../../src/models/User';
-import { IJwtPayload, generateJwtForUser } from '../../src/utils/jwt';
+import { generateJwtForUser } from '../../src/utils/jwt';
 import jwt from 'jsonwebtoken';
+import JWT from '../../@types/JWT';
 
 const testUser = { username: 'username', password: 'password' };
 
@@ -11,6 +12,6 @@ it('generateJwtForUser(). When: everything is ok. Expected: valid jwt string', a
 
   expect(token).not.toBe(null);
 
-  const decodedToken = <IJwtPayload>jwt.verify(token, process.env.jwt_secret!);
+  const decodedToken = <JWT>jwt.verify(token, process.env.jwt_secret!);
   expect(decodedToken.sub).toBe(user._id.toString());
 });

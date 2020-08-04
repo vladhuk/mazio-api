@@ -3,7 +3,7 @@ import express from 'express';
 import { authRequired } from '../../../src/middlewares/authentication';
 import User from '../../../src/models/User';
 import jwt from 'jsonwebtoken';
-import { IJwtPayload } from '../../../src/utils/jwt';
+import JWT from '../../../@types/JWT';
 
 const testUser = { username: 'someusername', password: 'somepassword' };
 
@@ -15,7 +15,7 @@ it('authRequired(). When: jwt is valid. Expected: user field in request', async 
   app.get('/', authRequired, (req, res) => res.json(req.jwt));
 
   const encodedToken = user.generateJwt();
-  const decodedBody = <IJwtPayload>jwt.decode(encodedToken);
+  const decodedBody = <JWT>jwt.decode(encodedToken);
   const bearerToken = `Bearer ${encodedToken}`;
 
   return request(app)
