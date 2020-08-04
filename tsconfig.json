@@ -4,11 +4,15 @@
     "module": "commonjs",                    
     "strict": true,                          
     "esModuleInterop": true,                 
-    "skipLibCheck": true,                    
     "forceConsistentCasingInFileNames": true,
 
     /* For debugging with launch.json */
     "outDir": "out", 
-    "sourceMap": true
-  }
+    "sourceMap": true,
+
+    "typeRoots": [
+      "./@types", 
+      "./node_modules/@types",
+    ],
+  },
 }
