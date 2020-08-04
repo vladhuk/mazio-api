@@ -12,7 +12,7 @@ it('authRequired(). When: jwt is valid. Expected: user field in request', async 
   await user.save();
 
   const app = express();
-  app.get('/', authRequired, (req, res) => res.json(req.user));
+  app.get('/', authRequired, (req, res) => res.json(req.jwt));
 
   const encodedToken = user.generateJwt();
   const decodedBody = <IJwtPayload>jwt.decode(encodedToken);
