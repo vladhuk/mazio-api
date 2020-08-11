@@ -1,6 +1,6 @@
 import { Schema } from 'mongoose';
 import { IUser } from '../../User';
-import { values } from '../../../utils/enum';
+import { names } from '../../../utils/enum';
 
 export interface IMember {
   user: IUser;
@@ -15,5 +15,5 @@ enum Role {
 
 export default new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  role: { type: Number, enum: values(Role), default: Role.PARTICIPANT },
+  role: { type: String, enum: names(Role), default: Role.PARTICIPANT },
 });
