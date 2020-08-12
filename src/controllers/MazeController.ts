@@ -7,8 +7,8 @@ import { Types } from 'mongoose';
 
 const defaultErrorHandler = getDefaultErrorHandler('MazeController');
 
-function getMazeTypeFromRequest(req: Request): number | null {
-  return req.query.type ? parseInt(<string>req.query.type) : null;
+function getMazeTypeFromRequest(req: Request): MazeType | null {
+  return req.query.type ? <MazeType>req.query.type : null;
 }
 
 export const getMazes: RequestHandler = (req, res) => {

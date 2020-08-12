@@ -3,7 +3,7 @@ import * as userService from '../services/UserService';
 import * as mazeService from '../services/MazeService';
 import { Types } from 'mongoose';
 import User from '../models/User';
-import Maze from '../models/Maze';
+import Maze, { Type as MazeType } from '../models/Maze';
 import { getDefaultErrorHandler } from '../utils/errorHandlers';
 
 const defaultErrorHandler = getDefaultErrorHandler('UserController');
@@ -119,7 +119,7 @@ export const removeDislikedMaze: RequestHandler = (req, res) => {
 };
 
 export const getMazes: RequestHandler = (req, res) => {
-  const mazeType = req.query.type ? parseInt(<string>req.query.type) : null;
+  const mazeType = req.query.type ? <MazeType>req.query.type : null;
   const userId = Types.ObjectId(req.params.id);
 
   const promisedUsers = mazeType
