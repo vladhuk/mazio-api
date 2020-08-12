@@ -1,19 +1,18 @@
 import Location, { ILocation } from './LocationSchema';
-import { names } from '../../../utils/enum';
 import { Schema } from 'mongoose';
 
 enum Direction {
-  TOP,
-  BOTTOM,
-  RIGHT,
-  LEFT,
+  TOP = 'TOP',
+  BOTTOM = 'BOTTOM',
+  RIGHT = 'RIGHT',
+  LEFT = 'LEFT',
 }
 
 enum Type {
-  DEFAULT,
-  RUBBER,
-  TRANSLUCENT,
-  OUTPUT,
+  DEFAULT = 'DEFAULT',
+  RUBBER = 'RUBBER',
+  TRANSLUCENT = 'TRANSLUCENT',
+  OUTPUT = 'OUTPUT',
 }
 
 export interface IWall {
@@ -24,6 +23,6 @@ export interface IWall {
 
 export default new Schema({
   location: { type: Location, required: true },
-  direction: { type: String, enum: names(Direction) },
-  type: { type: String, enum: names(Type) },
+  direction: { type: String, enum: Object.values(Direction) },
+  type: { type: String, enum: Object.values(Type) },
 });

@@ -1,6 +1,5 @@
 import { Schema } from 'mongoose';
 import { IUser } from '../../User';
-import { names } from '../../../utils/enum';
 
 export interface IMember {
   user: IUser;
@@ -8,12 +7,12 @@ export interface IMember {
 }
 
 enum Role {
-  WATCHER,
-  PARTICIPANT,
-  DEPUTY,
+  WATCHER = 'WATCHER',
+  PARTICIPANT = 'PARTICIPANT',
+  DEPUTY = 'DEPUTY',
 }
 
 export default new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  role: { type: String, enum: names(Role), default: Role.PARTICIPANT },
+  role: { type: String, enum: Object.values(Role), default: Role.PARTICIPANT },
 });

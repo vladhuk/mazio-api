@@ -1,19 +1,18 @@
 import Location, { ILocation } from './LocationSchema';
-import { names } from '../../../utils/enum';
 import { Schema } from 'mongoose';
 
 enum Type {
-  ARSENAL,
-  HOSPITAL,
-  TREASURE,
-  FAKE_TREASURE,
-  SPAWN,
-  RIVER,
-  RIVER_START,
-  RIVER_END,
-  TRAP,
-  PIT_IN,
-  PIT_OUT,
+  ARSENAL = 'ARSENAL',
+  HOSPITAL = 'HOSPITAL',
+  TREASURE = 'TREASURE',
+  FAKE_TREASURE = 'FAKE_TREASURE',
+  SPAWN = 'SPAWN',
+  RIVER = 'RIVER',
+  RIVER_START = 'RIVER_START',
+  RIVER_END = 'RIVER_END',
+  TRAP = 'TRAP',
+  PIT_IN = 'PIT_IN',
+  PIT_OUT = 'PIT_OUT',
 }
 
 export interface ICell {
@@ -25,5 +24,5 @@ export interface ICell {
 export default new Schema({
   location: { type: Location, required: true },
   ref: Location,
-  type: { type: String, enum: names(Type) },
+  type: { type: String, enum: Object.values(Type) },
 });

@@ -7,7 +7,6 @@ import {
   QueryPopulateOptions,
   DocumentQuery,
 } from 'mongoose';
-import { names } from '../../utils/enum';
 import InfoSchema, { IInfo } from './subdocs/InfoSchema';
 import StructureSchema, { IStructure } from './subdocs/StructureSchema';
 import User, { IUser, IUserDto } from '../User';
@@ -65,8 +64,8 @@ interface IMazeModel extends Model<IMaze, QueryHelpers> {
 }
 
 export enum Type {
-  DRAFT,
-  PUBLISHED,
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
 }
 
 const mazeSchema = new Schema(
@@ -76,7 +75,7 @@ const mazeSchema = new Schema(
     likes: { type: Number, min: 0, default: 0 },
     dislikes: { type: Number, min: 0, default: 0 },
     games: { type: Number, min: 0, default: 0 },
-    type: { type: String, enum: names(Type), default: Type.DRAFT },
+    type: { type: String, enum: Object.values(Type), default: Type.DRAFT },
     info: { type: InfoSchema, required: true },
     structure: { type: StructureSchema, required: true },
   },
