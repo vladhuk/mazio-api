@@ -7,7 +7,8 @@
     "node": ">=10.21.0"
   },
   "scripts": {
-    "start": "ts-node src/server.ts",
+    "start": "tsc && node out/src/server.js",
+    "start:dev": "ts-node-dev src/server.ts",
     "test": "jest --runInBand",
     "lint": "eslint src/ tests/ @types/"
   },
@@ -48,7 +49,8 @@
     "prettier": "^2.0.5",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.1",
-    "ts-node": "^8.10.2",
+    "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.1",
     "typescript": "^3.9.6"
   }
 }
