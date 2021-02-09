@@ -12,6 +12,20 @@ import { generateJwtForUser } from '../utils/jwt';
 import QueryOptions from '../../@types/QueryOptions';
 import UserNotFoundError from '../errors/UserNotFoundError';
 
+/**
+ * @swagger
+ *
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         username:
+ *           type: string
+ */
+
 interface IUserBase {
   username: string;
 }

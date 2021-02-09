@@ -15,6 +15,41 @@ import MazeNotFoundError from '../../errors/MazeNotFoundError';
 import QueryOptions from '../../../@types/QueryOptions';
 import NotFoundError from '../../errors/http/NotFoundError';
 
+/**
+ * @swagger
+ *
+ * components:
+ *   schemas:
+ *     MazeType:
+ *       type: string
+ *       enum: [DRAFT, PUBLISHED]
+ *     Maze:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         owner:
+ *           $ref: '#/components/schemas/User'
+ *         title:
+ *           type: string
+ *         likes:
+ *           type: integer
+ *         dislikes:
+ *           type: integer
+ *         games:
+ *           type: integer
+ *         type:
+ *           $ref: '#/components/schemas/MazeType'
+ *         structure:
+ *           type: object
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */
+
 interface IMazeBase {
   title: string;
   likes: number;
