@@ -11,6 +11,7 @@ function getMazeTypeFromRequest(req: Request): MazeType | null {
   return req.query.type ? <MazeType>req.query.type : null;
 }
 
+// TODO: Fix according to swagger description
 export const getMazes: RequestHandler = (req, res) => {
   const mazeType = getMazeTypeFromRequest(req);
 
@@ -25,6 +26,7 @@ export const getMazes: RequestHandler = (req, res) => {
     .catch((err) => defaultErrorHandler(err, res));
 };
 
+// TODO: Fix according to swagger description
 export const getMaze: RequestHandler = (req, res) => {
   const mazeType = getMazeTypeFromRequest(req);
 
