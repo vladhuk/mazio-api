@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../../../src/app';
+import app from '../../../src/config/app';
 import User from '../../../src/models/User';
 
 const testUser = { username: 'testusername', password: 'testpassword' };
