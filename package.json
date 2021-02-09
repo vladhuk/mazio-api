@@ -7,8 +7,10 @@
     "node": ">=10.21.0"
   },
   "scripts": {
-    "start": "tsc && node out/src/server.js",
-    "start:dev": "ts-node-dev src/server.ts",
+    "build": "tsc",
+    "start": "ts-node src/server.ts",
+    "start:dev": "ts-node-dev --poll src/server.ts",
+    "start:prod": "node out/src/server.js",
     "test": "jest --runInBand",
     "lint": "eslint src/ tests/ @types/"
   },
@@ -23,6 +25,8 @@
     "mongoose": "^5.9.21",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "swagger-jsdoc": "^6.0.2",
+    "swagger-ui-express": "^4.1.6",
     "winston": "^3.3.3"
   },
   "devDependencies": {
@@ -36,6 +40,8 @@
     "@types/passport": "^1.0.4",
     "@types/passport-local": "^1.0.33",
     "@types/supertest": "^2.0.10",
+    "@types/swagger-jsdoc": "^6.0.0",
+    "@types/swagger-ui-express": "^4.1.2",
     "@typescript-eslint/eslint-plugin": "^3.5.0",
     "@typescript-eslint/parser": "^3.5.0",
     "eslint": "^7.3.1",
