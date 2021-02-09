@@ -9,9 +9,16 @@ const getTokenFromHeader: jwt.GetTokenCallback = (req) => {
   return null;
 };
 
-export const authRequired = jwt({
+const defaultOptions: jwt.Options = {
   algorithms: ['HS256'],
   userProperty: 'jwt',
   secret: process.env.jwt_secret!,
   getToken: getTokenFromHeader,
+};
+
+export const authRequired = jwt(defaultOptions);
+
+export const authOptional = jwt({
+  ...defaultOptions,
+  credentialsRequired: false,
 });
